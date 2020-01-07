@@ -12,6 +12,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -84,13 +85,13 @@ public class Main extends Application {
                     if (verbose) System.out.println("Java FX received: " + str);
                     JSONObject jsonObj = JSONObject.parseObject(str);
                     switch (jsonObj.getString("action")) {
-                        case "init":
+                        case "init":{
                             Platform.runLater(() -> {
                                 Scene scene = new Scene(g, jsonObj.getIntValue("width"), jsonObj.getIntValue("height"));
                                 stage.setScene(scene);
                                 stage.show();
                             });
-                            break;
+                            break;}
                         case "get": {
                             switch (jsonObj.getString("object")) {
                                 case "wait-click": {
@@ -102,25 +103,38 @@ public class Main extends Application {
                                     }
                                     if(verbose)System.out.print("got click");
                                     backMsg.append(lastClick[0]);
+                                    break;
                                 }
-                                break;
+                                case "str": {
+                                    if(list.get(jsonObj.getInteger("id")) instanceof EmojisLabel)
+                                        backMsg.append(((EmojisLabel) (list.get(jsonObj.getInteger("id")))).getText());
+                                    else if(list.get(jsonObj.getInteger("id")) instanceof Button)
+                                        backMsg.append(((Button) (list.get(jsonObj.getInteger("id")))).getText());
+                                    else if(list.get(jsonObj.getInteger("id")) instanceof TextArea)
+                                        backMsg.append(((TextArea) (list.get(jsonObj.getInteger("id")))).getText());
+                                    break;
+                                }
+
                             }
                             break;
                         }
                         case "change": {
                             switch (jsonObj.getString("object")) {
-                                case "label":
-                                    ((EmojisLabel) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
+                                case "str":
+                                    if(list.get(jsonObj.getInteger("id")) instanceof EmojisLabel)
+                                        ((EmojisLabel) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
+                                    else if(list.get(jsonObj.getInteger("id")) instanceof Button)
+                                        ((Button) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
+                                    else if(list.get(jsonObj.getInteger("id")) instanceof TextArea)
+                                        ((TextArea) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
                                     break;
-                            }
+                            }break;
                         }
-                        break;
                         case "delete": {
                             Platform.runLater(() -> {
                                 g.getChildren().remove(list.get(jsonObj.getInteger("id")));
-                            });
+                            });break;
                         }
-                        break;
                         case "add": {
                             switch (jsonObj.getString("object")) {
                                 case "button": {
@@ -128,12 +142,26 @@ public class Main extends Application {
                                     but.setLayoutX(jsonObj.getIntValue("x"));
                                     but.setLayoutY(jsonObj.getIntValue("y"));
                                     but.setMinSize(jsonObj.getIntValue("w"), jsonObj.getIntValue("h"));
+                                    but.setMaxSize(jsonObj.getIntValue("w"), jsonObj.getIntValue("h"));
                                     int finalLastID = lastID;
                                     but.setOnAction(event -> {
                                         lastClick[0] = finalLastID;
                                     });
                                     Platform.runLater(() -> {g.getChildren().add(but);});
                                     list.put(lastID, but);
+                                    backMsg.append(lastID);
+                                    lastID++;
+                                }
+                                break;
+                                case "input": {
+                                    TextArea textA = new TextArea();
+                                    textA.setText(jsonObj.getString("str"));
+                                    textA.setLayoutX(jsonObj.getIntValue("x"));
+                                    textA.setLayoutY(jsonObj.getIntValue("y"));
+                                    textA.setMinSize(jsonObj.getIntValue("w"), jsonObj.getIntValue("h"));
+                                    textA.setMaxSize(jsonObj.getIntValue("w"), jsonObj.getIntValue("h"));
+                                    Platform.runLater(() -> {g.getChildren().add(textA);});
+                                    list.put(lastID, textA);
                                     backMsg.append(lastID);
                                     lastID++;
                                 }

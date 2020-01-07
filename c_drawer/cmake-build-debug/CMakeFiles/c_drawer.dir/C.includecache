@@ -6,24 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.c
-string.h
--
-stdio.h
--
-math.h
--
-stdlib.h
--
-limits.h
--
-ctype.h
--
-locale.h
--
-cJSON.h
-/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h
-
 /Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h
 stddef.h
 -

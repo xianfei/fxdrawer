@@ -81,6 +81,7 @@ typedef int objID; // Object ID -  a descriptor referencing the fx object
 int sd; // a descriptor referencing the socket
 #define BUFFLEN 512
 char buf[BUFFLEN]; // buffer storing the string which received or will send
+// the buf in socket : low 16bit for string length, buf+2 is string content
 
 
 int sendJson(cJSON *jsonObj) {
@@ -274,11 +275,22 @@ void changeText(objID id,const char* stringContext){
     cJSON *jsonObj;
     jsonObj = cJSON_CreateObject();
     cJSON_AddStringToObject(jsonObj, "action", "change");
-    cJSON_AddStringToObject(jsonObj, "object", "label");
+    cJSON_AddStringToObject(jsonObj, "object", "str");
     cJSON_AddNumberToObject(jsonObj, "id", id);
     cJSON_AddStringToObject(jsonObj, "str", stringContext);
     sendJson(jsonObj);
     cJSON_Delete(jsonObj);
+}
+
+void getText(objID id,char* stringBuffer){
+    cJSON *jsonObj;
+    jsonObj = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonObj, "action", "get");
+    cJSON_AddStringToObject(jsonObj, "object", "str");
+    cJSON_AddNumberToObject(jsonObj, "id", id);
+    sendJson(jsonObj);
+    cJSON_Delete(jsonObj);
+    if(buf[2]=='o')strcpy(stringBuffer,buf+4);
 }
 
 void removeByID(objID id){
@@ -319,6 +331,21 @@ objID putButton(int x, int y, int width, int height,const char* stringContext){
     return id;
 }
 
+objID putInputBox(int x, int y, int width, int height){
+    cJSON *jsonObj;
+    jsonObj = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonObj, "action", "add");
+    cJSON_AddStringToObject(jsonObj, "object", "input");
+    cJSON_AddNumberToObject(jsonObj, "x", x);
+    cJSON_AddNumberToObject(jsonObj, "y", y);
+    cJSON_AddNumberToObject(jsonObj, "w", width);
+    cJSON_AddNumberToObject(jsonObj, "h", height);
+    sendJson(jsonObj);
+    cJSON_Delete(jsonObj);
+    objID id=-1;
+    sscanf(buf+2,"ok%d",&id);
+    return id;
+}
 
 
 #endif //XIANFEI_DRAWER_H
