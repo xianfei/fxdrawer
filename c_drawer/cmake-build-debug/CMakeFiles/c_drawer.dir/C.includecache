@@ -1,0 +1,70 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.c
+string.h
+-
+stdio.h
+-
+math.h
+-
+stdlib.h
+-
+limits.h
+-
+ctype.h
+-
+locale.h
+-
+cJSON.h
+/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h
+
+/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h
+stddef.h
+-
+
+/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/drawer.h
+cJSON.h
+/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h
+stdexcept
+-
+exception
+-
+cstdio
+-
+cstdlib
+-
+stdio.h
+-
+stdlib.h
+-
+assert.h
+-
+windows.h
+-
+winsock2.h
+-
+string.h
+-
+unistd.h
+-
+sys/types.h
+-
+sys/socket.h
+-
+netinet/in.h
+-
+arpa/inet.h
+-
+netdb.h
+-
+
+/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/main.c
+drawer.h
+/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/drawer.h
+

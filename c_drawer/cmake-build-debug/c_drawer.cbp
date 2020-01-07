@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="c_drawer"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="c_drawer">
+				<Option output="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/c_drawer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 c_drawer"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="c_drawer/fast">
+				<Option output="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/c_drawer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 c_drawer/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xianfei/OneDrive\ -\ bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.c">
+			<Option target="c_drawer"/>
+		</Unit>
+		<Unit filename="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h">
+			<Option target="c_drawer"/>
+		</Unit>
+		<Unit filename="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/drawer.h">
+			<Option target="c_drawer"/>
+		</Unit>
+		<Unit filename="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/main.c">
+			<Option target="c_drawer"/>
+		</Unit>
+		<Unit filename="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
