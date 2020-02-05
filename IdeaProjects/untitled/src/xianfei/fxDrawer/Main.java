@@ -13,6 +13,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -37,6 +39,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         // 对启动参数进行处理
+
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-port")) {
                 port = Integer.parseInt(args[++i]);
@@ -48,7 +51,7 @@ public class Main extends Application {
                 verbose = Boolean.parseBoolean(args[++i]);
             }
         }
-        if(verbose)System.out.println("fxDraw by xianfei v0.0.1");
+        if(verbose)System.out.println("fxDraw by xianfei v0.0.3");
         if(verbose)System.out.println(System.getProperties());
         launch(args);
     }
@@ -133,10 +136,28 @@ public class Main extends Application {
                         case "delete": {
                             Platform.runLater(() -> {
                                 g.getChildren().remove(list.get(jsonObj.getInteger("id")));
-                            });break;
+                            });
+                            list.remove(jsonObj.getInteger("id"));
+                            break;
                         }
                         case "add": {
                             switch (jsonObj.getString("object")) {
+                                case "image":{
+                                    ImageView img = new ImageView(new Image(new File(jsonObj.getString("path")).toURI().toString()));
+                                    if(verbose)System.out.println(new File(jsonObj.getString("path")).toURI().toString());
+                                    img.setLayoutX(jsonObj.getIntValue("x"));
+                                    img.setLayoutY(jsonObj.getIntValue("y"));
+                                    img.setFitHeight(jsonObj.getIntValue("h"));
+                                    img.setFitWidth(jsonObj.getIntValue("w"));
+                                    int finalLastID = lastID;
+                                    img.setOnMouseClicked(event -> {
+                                        lastClick[0] = finalLastID;
+                                    });
+                                    Platform.runLater(() -> {g.getChildren().add(img);});
+                                    list.put(lastID, img);
+                                    backMsg.append(lastID);
+                                    lastID++;
+                                }break;
                                 case "button": {
                                     Button but = new Button(jsonObj.getString("str"));
                                     but.setLayoutX(jsonObj.getIntValue("x"));
@@ -179,7 +200,7 @@ public class Main extends Application {
                                     box.setMinWidth(1000);
                                     box.getChildren().add(label);
                                     Platform.runLater(() -> {g.getChildren().add(box);});
-                                    list.put(lastID, label);
+                                    list.put(lastID, box);
                                     backMsg.append(lastID);
                                     lastID++;
 //                                        g.getChildren().add(label);
