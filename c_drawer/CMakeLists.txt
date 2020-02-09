@@ -3,4 +3,4 @@ project(c_drawer C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(c_drawer main.c drawer.h cJSON.c cJSON.h)
+add_executable(c_drawer main.c drawer.h)

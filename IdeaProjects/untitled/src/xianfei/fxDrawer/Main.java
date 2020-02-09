@@ -1,35 +1,32 @@
 package xianfei.fxDrawer;
 
 import java.io.*;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import com.alibaba.fastjson.*;
-import javafx.stage.WindowEvent;
 
 import com.madeorsk.emojisfx.EmojisLabel;
-import com.madeorsk.emojisfx.Range;
 
 
 public class Main extends Application {
@@ -51,8 +48,8 @@ public class Main extends Application {
                 verbose = Boolean.parseBoolean(args[++i]);
             }
         }
-        if(verbose)System.out.println("fxDraw by xianfei v0.0.3");
-        if(verbose)System.out.println(System.getProperties());
+        if (verbose) System.out.println("fxDraw by xianfei v0.0.4");
+        if (verbose) System.out.println(System.getProperties());
         launch(args);
     }
 
@@ -88,13 +85,14 @@ public class Main extends Application {
                     if (verbose) System.out.println("Java FX received: " + str);
                     JSONObject jsonObj = JSONObject.parseObject(str);
                     switch (jsonObj.getString("action")) {
-                        case "init":{
+                        case "init": {
                             Platform.runLater(() -> {
                                 Scene scene = new Scene(g, jsonObj.getIntValue("width"), jsonObj.getIntValue("height"));
                                 stage.setScene(scene);
                                 stage.show();
                             });
-                            break;}
+                            break;
+                        }
                         case "get": {
                             switch (jsonObj.getString("object")) {
                                 case "wait-click": {
@@ -104,17 +102,73 @@ public class Main extends Application {
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
-                                    if(verbose)System.out.print("got click");
+                                    if (verbose) System.out.print("got click");
                                     backMsg.append(lastClick[0]);
                                     break;
                                 }
                                 case "str": {
-                                    if(list.get(jsonObj.getInteger("id")) instanceof EmojisLabel)
-                                        backMsg.append(((EmojisLabel) (list.get(jsonObj.getInteger("id")))).getText());
-                                    else if(list.get(jsonObj.getInteger("id")) instanceof Button)
+                                    if (list.get(jsonObj.getInteger("id")) instanceof VBox)
+                                        backMsg.append(((EmojisLabel) (((VBox) (list.get(jsonObj.getInteger("id")))).getChildren().get(0))).getText());
+                                    else if (list.get(jsonObj.getInteger("id")) instanceof Button)
                                         backMsg.append(((Button) (list.get(jsonObj.getInteger("id")))).getText());
-                                    else if(list.get(jsonObj.getInteger("id")) instanceof TextArea)
+                                    else if (list.get(jsonObj.getInteger("id")) instanceof TextArea)
                                         backMsg.append(((TextArea) (list.get(jsonObj.getInteger("id")))).getText());
+                                    break;
+                                }
+
+                            }
+                            break;
+                        }
+                        case "show": {
+                            switch (jsonObj.getString("object")) {
+                                case "filechooser": {
+                                    int []sema = new int[1];
+                                    sema[0]=-1;
+                                    Platform.runLater(() -> {
+                                    FileChooser fileChooser = new FileChooser();
+                                    File file = fileChooser.showOpenDialog(stage);
+                                    if (file != null) {
+                                        if (verbose) System.out.println(file.toString());
+                                        backMsg.append(file.toString());
+                                    }
+                                        sema[0]=0;
+                                    });
+                                    try {
+                                        while (sema[0] == -1) Thread.sleep(10);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                }
+                                case "dialog": {
+                                    int []sema = new int[1];
+                                    sema[0]=-1;
+                                    Platform.runLater(() -> {
+                                        String []opts = jsonObj.getString("option").split("\\|");
+                                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                                        alert.setTitle(jsonObj.getString("title"));
+                                        alert.setHeaderText(null);
+                                        alert.setContentText(jsonObj.getString("str"));
+                                        ButtonType []buts=new ButtonType[opts.length+1];
+                                        buts[0] = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+                                        for (int i = 1; i < buts.length; i++) {
+                                            buts[i] = new ButtonType(opts[i-1]);
+                                        }
+                                        alert.getButtonTypes().clear();
+                                        for (int i = 0; i < buts.length; i++) {
+                                            alert.getButtonTypes().add(buts[i]);
+                                        }
+                                        Optional<ButtonType> result = alert.showAndWait();
+                                        for (int i = 0; i < buts.length; i++) {
+                                            if (result.get() == buts[i])backMsg.append(i);
+                                        }
+                                    sema[0]=0;
+                                    });
+                                    try {
+                                        while (sema[0] == -1) Thread.sleep(10);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                     break;
                                 }
 
@@ -124,27 +178,43 @@ public class Main extends Application {
                         case "change": {
                             switch (jsonObj.getString("object")) {
                                 case "str":
-                                    if(list.get(jsonObj.getInteger("id")) instanceof EmojisLabel)
-                                        ((EmojisLabel) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
-                                    else if(list.get(jsonObj.getInteger("id")) instanceof Button)
-                                        ((Button) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
-                                    else if(list.get(jsonObj.getInteger("id")) instanceof TextArea)
-                                        ((TextArea) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
+                                    Platform.runLater(() -> {
+                                        if (list.get(jsonObj.getInteger("id")) instanceof VBox)
+                                            ((EmojisLabel) (((VBox) (list.get(jsonObj.getInteger("id")))).getChildren().get(0))).setText(jsonObj.getString("str"));
+                                        else if (list.get(jsonObj.getInteger("id")) instanceof Button)
+                                            ((Button) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
+                                        else if (list.get(jsonObj.getInteger("id")) instanceof TextArea)
+                                            ((TextArea) (list.get(jsonObj.getInteger("id")))).setText(jsonObj.getString("str"));
+                                    });
                                     break;
-                            }break;
+                                case "path":
+                                    Platform.runLater(() -> {
+                                        if (list.get(jsonObj.getInteger("id")) instanceof ImageView)
+                                            ((ImageView) (list.get(jsonObj.getInteger("id")))).setImage(new Image(new File(jsonObj.getString("str")).toURI().toString()));
+                                    });
+                                    break;
+                                case "position":
+                                    Platform.runLater(() -> {
+                                        (list.get(jsonObj.getInteger("id"))).setLayoutX(jsonObj.getIntValue("x"));
+                                        (list.get(jsonObj.getInteger("id"))).setLayoutY(jsonObj.getIntValue("y"));
+                                    });
+                                    break;
+                            }
+                            break;
                         }
                         case "delete": {
                             Platform.runLater(() -> {
                                 g.getChildren().remove(list.get(jsonObj.getInteger("id")));
+                                list.remove(jsonObj.getInteger("id"));
                             });
-                            list.remove(jsonObj.getInteger("id"));
                             break;
                         }
                         case "add": {
                             switch (jsonObj.getString("object")) {
-                                case "image":{
+                                case "image": {
                                     ImageView img = new ImageView(new Image(new File(jsonObj.getString("path")).toURI().toString()));
-                                    if(verbose)System.out.println(new File(jsonObj.getString("path")).toURI().toString());
+                                    if (verbose)
+                                        System.out.println(new File(jsonObj.getString("path")).toURI().toString());
                                     img.setLayoutX(jsonObj.getIntValue("x"));
                                     img.setLayoutY(jsonObj.getIntValue("y"));
                                     img.setFitHeight(jsonObj.getIntValue("h"));
@@ -153,11 +223,14 @@ public class Main extends Application {
                                     img.setOnMouseClicked(event -> {
                                         lastClick[0] = finalLastID;
                                     });
-                                    Platform.runLater(() -> {g.getChildren().add(img);});
+                                    Platform.runLater(() -> {
+                                        g.getChildren().add(img);
+                                    });
                                     list.put(lastID, img);
                                     backMsg.append(lastID);
                                     lastID++;
-                                }break;
+                                }
+                                break;
                                 case "button": {
                                     Button but = new Button(jsonObj.getString("str"));
                                     but.setLayoutX(jsonObj.getIntValue("x"));
@@ -168,7 +241,9 @@ public class Main extends Application {
                                     but.setOnAction(event -> {
                                         lastClick[0] = finalLastID;
                                     });
-                                    Platform.runLater(() -> {g.getChildren().add(but);});
+                                    Platform.runLater(() -> {
+                                        g.getChildren().add(but);
+                                    });
                                     list.put(lastID, but);
                                     backMsg.append(lastID);
                                     lastID++;
@@ -181,7 +256,9 @@ public class Main extends Application {
                                     textA.setLayoutY(jsonObj.getIntValue("y"));
                                     textA.setMinSize(jsonObj.getIntValue("w"), jsonObj.getIntValue("h"));
                                     textA.setMaxSize(jsonObj.getIntValue("w"), jsonObj.getIntValue("h"));
-                                    Platform.runLater(() -> {g.getChildren().add(textA);});
+                                    Platform.runLater(() -> {
+                                        g.getChildren().add(textA);
+                                    });
                                     list.put(lastID, textA);
                                     backMsg.append(lastID);
                                     lastID++;
@@ -190,7 +267,7 @@ public class Main extends Application {
                                 case "label": {
 //                                    Platform.runLater(() -> {
                                     EmojisLabel label = new EmojisLabel(jsonObj.getString("str"));
-                                    label.setFont(Font.font(24)); // Please, I want to see this text!
+                                    label.setFont(Font.font(jsonObj.getDoubleValue("size"))); // Please, I want to see this text!
                                     label.setTextFill(Color.rgb(jsonObj.getIntValue("color-r"), jsonObj.getIntValue("color-g"),
                                             jsonObj.getIntValue("color-b"), jsonObj.getDoubleValue("color-a")));
                                     VBox box = new VBox();
@@ -199,7 +276,9 @@ public class Main extends Application {
                                     box.setLayoutY(jsonObj.getIntValue("y"));
                                     box.setMinWidth(1000);
                                     box.getChildren().add(label);
-                                    Platform.runLater(() -> {g.getChildren().add(box);});
+                                    Platform.runLater(() -> {
+                                        g.getChildren().add(box);
+                                    });
                                     list.put(lastID, box);
                                     backMsg.append(lastID);
                                     lastID++;
@@ -224,7 +303,9 @@ public class Main extends Application {
                                     c.setCenterX(jsonObj.getIntValue("x"));
                                     c.setCenterY(jsonObj.getIntValue("y"));
                                     c.setRadius(jsonObj.getIntValue("r"));
-                                    Platform.runLater(() -> {g.getChildren().add(c);});
+                                    Platform.runLater(() -> {
+                                        g.getChildren().add(c);
+                                    });
                                     list.put(lastID, c);
                                     backMsg.append(lastID);
                                     lastID++;
@@ -239,7 +320,9 @@ public class Main extends Application {
                                     r.setHeight(jsonObj.getIntValue("h"));
                                     r.setFill(Color.rgb(jsonObj.getIntValue("color-r"), jsonObj.getIntValue("color-g"),
                                             jsonObj.getIntValue("color-b"), jsonObj.getDoubleValue("color-a")));
-                                    Platform.runLater(() -> {g.getChildren().add(r);});
+                                    Platform.runLater(() -> {
+                                        g.getChildren().add(r);
+                                    });
                                     list.put(lastID, r);
                                     backMsg.append(lastID);
                                     lastID++;
@@ -257,7 +340,9 @@ public class Main extends Application {
                                     r.getPoints().addAll(points);
                                     r.setFill(Color.rgb(jsonObj.getIntValue("color-r"), jsonObj.getIntValue("color-g"),
                                             jsonObj.getIntValue("color-b"), jsonObj.getDoubleValue("color-a")));
-                                    Platform.runLater(() -> {g.getChildren().add(r);});
+                                    Platform.runLater(() -> {
+                                        g.getChildren().add(r);
+                                    });
                                     list.put(lastID, r);
                                     backMsg.append(lastID);
                                     lastID++;

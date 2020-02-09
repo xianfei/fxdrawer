@@ -123,33 +123,6 @@ c_drawer/fast:
 	$(MAKE) -f CMakeFiles/c_drawer.dir/build.make CMakeFiles/c_drawer.dir/build
 .PHONY : c_drawer/fast
 
-cJSON.o: cJSON.c.o
-
-.PHONY : cJSON.o
-
-# target to build an object file
-cJSON.c.o:
-	$(MAKE) -f CMakeFiles/c_drawer.dir/build.make CMakeFiles/c_drawer.dir/cJSON.c.o
-.PHONY : cJSON.c.o
-
-cJSON.i: cJSON.c.i
-
-.PHONY : cJSON.i
-
-# target to preprocess a source file
-cJSON.c.i:
-	$(MAKE) -f CMakeFiles/c_drawer.dir/build.make CMakeFiles/c_drawer.dir/cJSON.c.i
-.PHONY : cJSON.c.i
-
-cJSON.s: cJSON.c.s
-
-.PHONY : cJSON.s
-
-# target to generate assembly for a file
-cJSON.c.s:
-	$(MAKE) -f CMakeFiles/c_drawer.dir/build.make CMakeFiles/c_drawer.dir/cJSON.c.s
-.PHONY : cJSON.c.s
-
 main.o: main.c.o
 
 .PHONY : main.o
@@ -186,9 +159,6 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... c_drawer"
-	@echo "... cJSON.o"
-	@echo "... cJSON.i"
-	@echo "... cJSON.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

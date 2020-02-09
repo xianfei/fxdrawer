@@ -1,5 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/c_drawer.dir/cJSON.c.o"
   "CMakeFiles/c_drawer.dir/main.c.o"
   "c_drawer"
   "c_drawer.pdb"

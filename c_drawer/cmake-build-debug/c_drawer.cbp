@@ -80,12 +80,6 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.c">
-			<Option target="c_drawer"/>
-		</Unit>
-		<Unit filename="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h">
-			<Option target="c_drawer"/>
-		</Unit>
 		<Unit filename="/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/drawer.h">
 			<Option target="c_drawer"/>
 		</Unit>

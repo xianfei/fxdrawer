@@ -6,13 +6,23 @@
 
 #IncludeRegexTransform: 
 
-/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h
+/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/drawer.h
 stddef.h
 -
-
-/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/drawer.h
-cJSON.h
-/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.h
+string.h
+-
+stdio.h
+-
+math.h
+-
+stdlib.h
+-
+limits.h
+-
+ctype.h
+-
+locale.h
+-
 stdexcept
 -
 exception

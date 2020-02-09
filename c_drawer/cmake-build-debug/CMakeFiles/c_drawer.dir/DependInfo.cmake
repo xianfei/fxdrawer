@@ -4,7 +4,6 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cJSON.c" "/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/CMakeFiles/c_drawer.dir/cJSON.c.o"
   "/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/main.c" "/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/CMakeFiles/c_drawer.dir/main.c.o"
   )
 set(CMAKE_C_COMPILER_ID "AppleClang")
