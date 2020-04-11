@@ -22,13 +22,13 @@
 
 ##### 快速使用方法
 
-将fxDrawer文件夹拷贝到项目文件夹中，在“解决方案资源管理器”中选择当前项目的“头文件”，右键-添加-现有项，将fxDrawer文件夹中的drawer.h添加，并在首行 `#include "fxDrawer/drawer.h"` 后即可使用。
+将fxDrawer文件夹拷贝到项目文件夹中，在“解决方案资源管理器”中选择当前项目的“头文件”，右键-添加-现有项，将fxDrawer文件夹中的drawer.h添加，并在“源文件”中添加drawer.c(针对c语言)drawer.cpp(针对c++)，并在首行 `#include "fxDrawer/drawer.h"` 后即可使用。
 
 ![](img/4.png)
 
 ##### 安装使用方法
 
-将fxDrawer文件夹拷贝到系统环境变量PATH之一的文件夹内（除system32），也可将fxDrawer拷贝到任意文件夹，并将其上级文件夹添加到系统环境变量PATH中。然后将fxDrawer文件夹中的drawer.h拷贝到vs头文件目录（默认为 `C:\Program Files (x86)\Microsoft Visual Studio\20XX\<Community/Profeccsional/Enterprise>\VC\Tools\MSVC\<版本号>\include` ）中，并在之后使用时首行添加 `#include <drawer.h>` 后即可使用。
+将fxDrawer文件夹拷贝到系统环境变量PATH之一的文件夹内（除system32），也可将fxDrawer拷贝到任意文件夹，并将其上级文件夹添加到系统环境变量PATH中。然后将fxDrawer文件夹中的drawer.h及drawer.c(针对c语言)drawer.cpp(针对c++)拷贝到vs头文件目录（默认为 `C:\Program Files (x86)\Microsoft Visual Studio\20XX\<Community/Profeccsional/Enterprise>\VC\Tools\MSVC\<版本号>\include` ）中，并在之后使用时首行添加 `#include <drawer.h>` 后即可使用。
 
 ### c) APIs:
 
@@ -176,6 +176,12 @@ int showChooseDialog(const char* title,const char* stringContext,const char* opt
 ## 5. 平台兼容性
 
 ## 6. 更新日志
+
+- 0.0.6 alpha 2020.4
+
+修正了在vs上的一些链接错误
+
+拆分.h .cpp .c 文件
 
 - 0.0.5 alpha 2020.2
 
