@@ -1,14 +1,26 @@
+
+>为0.0.8版本编写  2020.1
+
 # fxDrawer by xianfei
 
 一个会让你喜欢的通用语言跨平台使用极其简单的面向过程绘图器。
 
 ![](img/1.png)
 
-目前适配C/C++语言，在macOS/Windows平台下的CLion 2019/Visual Studio 2019通过测试。
+目前适配C/C++、Python语言，在macOS/Windows平台下的CLion 2020/Visual Studio 2019、Pycharm 2020通过测试。
+
+## 0. 来唠唠嗑
+
+>大二上学期期末之前偶然想到的点子，当时刚学完Java然后感觉每门语言的图形库都不太一样好烦，而且ege这个东西太古老了做个鼠标交互以及在retina屏幕上都好难受于是打算自己开发一款图形库，毕竟是自己维护所以想到什么功能就加上了，许多功能都是受ege启发所以感觉用起来应该会和ege很像，甚至可以封装成和ege一模一样。毕竟是自己写的库不一定好用，ege也有个十多年历史了吧，如果有问题可以进行反馈（不过之后我应该要忙着考研了）。这个项目大创定级只评了C我也不知道是评委老师没看懂还是不看好这个项目，不过话说从最开始写第一版到现在已经有快一年了，大三好忙呀，各位加油喔。
+>-- 计算机学院  软件工程  18级  王衔飞   2021.1
 
 ## 1. 特色功能
 
-// 待更新
+- 支持高分屏、抗锯齿、触摸屏、键盘触摸条等炫酷功能
+
+- 跨平台、跨语言
+
+- 模仿ege/easyx进行开发，但比他们更简单更好用
 
 ## 2. 使用手册
 
@@ -30,7 +42,13 @@
 
 将fxDrawer文件夹拷贝到系统环境变量PATH之一的文件夹内（除system32），也可将fxDrawer拷贝到任意文件夹，并将其上级文件夹添加到系统环境变量PATH中。然后将fxDrawer文件夹中的drawer.h及drawer.c(针对c语言)drawer.cpp(针对c++)拷贝到vs头文件目录（默认为 `C:\Program Files (x86)\Microsoft Visual Studio\20XX\<Community/Profeccsional/Enterprise>\VC\Tools\MSVC\<版本号>\include` ）中，并在之后使用时首行添加 `#include <drawer.h>` 后即可使用。
 
+##### 发布打包方法
+
+将vs生成的exe文件与fxDrawer文件夹放在同一文件夹内即可，建议使用7zip打包（使用7z格式压缩文件在二十兆左右，使用zip格式在三十兆左右）。
+
 ### c) APIs:
+
+此处使用C语言API作为示范，Python上与大体其一致，只是下文中接受参数`char* stringBuffer`改为返回字符串，接受参数会少一个
 
 #### 控制相关
 
@@ -47,6 +65,13 @@ int initDrawer(int width, int height);
 void setColor(int r, int g, int b, double a);
 ```
 用于设置绘图器将要绘图的颜色，RGBa格式，其中色彩分量RGB范围0-255，透明度a范围0-1。
+
+3. 设置描边
+
+```c
+void setStroke(int r, int g, int b, double a, double width);
+```
+用于设置绘图器将要绘制图形并描边（仅限draw打头的绘制函数使用），RGBa格式，其中色彩分量RGB范围0-255，透明度a范围0-1，width是描边宽度。不描边时可将后两个值的任意一个设置为0.0即可。
 
 #### 绘制图形相关
 
@@ -163,6 +188,10 @@ int showChooseDialog(const char* title,const char* stringContext,const char* opt
 
 ## 3. 示例
 
+见项目中c语言和Python的demo项目 (几乎一样喔~)
+
+![demo](img/demo.jpg)
+
 ## 4. Bug List
 
 ### 已知bug
@@ -175,7 +204,27 @@ int showChooseDialog(const char* title,const char* stringContext,const char* opt
 
 ## 5. 平台兼容性
 
-## 6. 更新日志
+MacBook Pro  (Apple silicon M1)  macOS 11.0.1 c/c++(clion) 、 python(pycharm) 测试通过
+
+黑苹果台式机  (Intel i7-4790k)  macOS 10.15.4 c/c++(clion) 、 python(pycharm) 测试通过
+
+HP笔记本 (Intel i5-8250u)  Windows 10   c/c++(clion/VS2019) 、 python(pycharm) 测试通过
+
+## 6. 平台特性
+
+- 在macOS上支持带有touchBar的MacBook Pro，在创建按钮时会自动添加到touch bar（左端作为栈顶）
+
+![touchbar](img/touchbar.jpg)
+
+## 7. 更新日志
+
+- 0.0.8 alpha 2021.1
+
+增加了对于Python语言的支持
+
+增加了macOS对touchbar的支持
+
+增加了绘图描边选项
 
 - 0.0.6 alpha 2020.4
 
@@ -219,7 +268,7 @@ int showChooseDialog(const char* title,const char* stringContext,const char* opt
 
 绘图器和C语言程序联动 关闭绘图窗口后自动结束进程 反之亦然
 
-## 7. Todo List
+## 8. Todo List
 
 - [x] 放置输入框并读取内容
 
@@ -229,7 +278,7 @@ int showChooseDialog(const char* title,const char* stringContext,const char* opt
 
 - [ ] 放置Web浏览器
 
-## 8. 鸣谢及开源许可
+## 9. 鸣谢及开源许可
 
 该项目使用了以下开源项目作为组件，特此鸣谢。
 
@@ -238,5 +287,7 @@ int showChooseDialog(const char* title,const char* stringContext,const char* opt
   fastjson | Apache-2.0 | [Link](https://github.com/alibaba/fastjson) | Java json解析
   cJSON | MIT License | [Link](https://github.com/DaveGamble/cJSON) | C json解析
   EmojisFX | MIT License | [Link](https://github.com/Madeorsk/EmojisFX) | Emoji输出支持
+  JTouchBar | MIT License | [Link](https://github.com/Thizzer/jtouchbar) | Touchbar支持
   SVG Salamander | LGPL and BSD | [Link](https://github.com/blackears/svgSalamander) | SVG渲染
+  
 
