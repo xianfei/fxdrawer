@@ -1,3 +1,4 @@
+window.$ = window.jQuery = require("./md/jquery-3.4.1.min.js");
 //是否显示导航栏
 var showNavBar = true;
 //是否展开导航栏
@@ -39,13 +40,15 @@ $(document).ready(function(){
        return;
    }
 
-   $("body").prepend('<div class="BlogAnchor">' + 
+   $("#write").after('<div class="BlogAnchor">' + 
        
        '<p class="html_header">' + 
            '<span></span>' + 
        '</p>' + 
        '<div class="AnchorContent" id="AnchorContent"> </div>' + 
    '</div>' );
+
+   var id = 0;
 
    var vH1Index = 0;
    var vH2Index = 0;
@@ -67,7 +70,7 @@ $(document).ready(function(){
        $(item).attr("id","wow"+id);
        $(item).addClass("wow_head");
        $("#AnchorContent").css('max-height', ($(window).height() - 80) + 'px');
-       $("#AnchorContent").append('<li><a class="nav_item '+className+' anchor-link" onclick="return false;" href="#" link="#wow'+id+'">'+""+""+$(this).text()+'</a></li>');
+       $("#AnchorContent").append('<li><a class="nav_item '+className+' anchor-link" onclick="return false;" href="#wow'+id+'" link="#wow'+id+'">'+""+""+$(this).text()+'</a></li>');
    });
 
    

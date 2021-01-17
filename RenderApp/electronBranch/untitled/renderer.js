@@ -4,6 +4,10 @@
 
 window.$ = window.jQuery = require("./jquery.js");
 
+const customTitlebar = require('custom-electron-titlebar');
+
+var titlebar;
+
 const {ipcRenderer, remote} = require('electron')
 
 let objMap = new Map();
@@ -29,6 +33,7 @@ function clickHandler(id) {
 }
 
 async function guiParser(jsonStr) {
+    try {
     console.log(jsonStr.toString())
     const obj = JSON.parse(jsonStr.toString());
     switch (obj.action) {
@@ -61,22 +66,22 @@ async function guiParser(jsonStr) {
             switch (obj["object"]){
                 case 'label':
                     setFillColor(obj);
-                    $('#controlObjs').append('<font id="fxdrawerObj' + objIndex + '" style="white-space: pre-line;position:absolute;left:'+ obj.x+'px;top:'+obj.y+'px;color:'+fillColor+'">'+obj.str+'</font>');
+                    $('#controlObjs').append('<font id="' + objIndex + '" style="font-size: '+obj.size+'px;white-space: pre-line;position:absolute;left:'+ obj.x+'px;top:'+obj.y+'px;color:'+fillColor+'">'+obj.str+'</font>');
                     objIndex++;
                     return objIndex - 1;
                 case 'button':
-                    $('#controlObjs').append('<button onclick="clickHandler('+objIndex+')" id="fxdrawerObj' + objIndex + '" style="position:absolute;left:'+ obj.x+'px;top:'+obj.y+'px;height: '+obj.h+'px;width: '+obj.w+'px;">'+obj.str+'</button>');
+                    $('#controlObjs').append('<button onclick="clickHandler('+objIndex+')" id="' + objIndex + '" style="position:absolute;left:'+ obj.x+'px;top:'+obj.y+'px;height: '+obj.h+'px;width: '+obj.w+'px;">'+obj.str+'</button>');
                     objIndex++;
                     return objIndex - 1;
                 case 'input':
-                    $('#controlObjs').append('<input id="fxdrawerObj' + objIndex + '" style="position:absolute;left:'+ obj.x+'px;top:'+obj.y+'px;height: '+obj.h+'px;width: '+obj.w+'px;"></input>');
+                    $('#controlObjs').append('<input id="' + objIndex + '" style="position:absolute;left:'+ obj.x+'px;top:'+obj.y+'px;height: '+obj.h+'px;width: '+obj.w+'px;"></input>');
                     objIndex++;
                     return objIndex - 1;
             }break;
         case 'change':
             switch (obj["object"]){
                 case 'str':
-                    document.getElementById('fxdrawerObj'+obj.id).innerText = obj.str;
+                    document.getElementById(''+obj.id).innerText = obj.str;
                     return '';
             }break;
         case 'get':
@@ -88,29 +93,48 @@ async function guiParser(jsonStr) {
                     clickResolve = null;
                     return clickID;
                 case 'str':
-                    if($('#fxdrawerObj'+obj.id).attr("value")!=="undefined")
-                        return $('#fxdrawerObj'+obj.id).val().toString();
-                    else return $('fxdrawerObj'+obj.id).innerText.toString();
+                    if($('#'+obj.id).attr("value")!=="undefined")
+                        return $('#'+obj.id).val().toString();
+                    else return $(''+obj.id).innerText.toString();
             }break;
         case 'delete':
-            document.getElementById('fxdrawerObj'+obj.id).remove()
+            document.getElementById(''+obj.id).remove()
+            break;
+        case 'execute':
+            var ret = eval(obj.code)
+            return JSON.stringify(ret).toString();
     }
     return '';
+}catch(err) {
+    console.error(err.message);
+    if(err.message !== "Cannot read property 'toString' of undefined")
+        alert('Exception: '+err.message);
+    return '';
+} 
 }
 
 window.onload = function () {
+    if(process.platform !== 'darwin'){
+        titlebar = new customTitlebar.Titlebar({
+            // backgroundColor: customTitlebar.Color.fromHex('#77777737'),
+            backgroundColor: customTitlebar.Color.fromHex('#eeeeeeae'),
+        });
+    }
     // 监听绘图请求
     ipcRenderer.on('opt-request', async function (event, ...args) {
         const ret = await guiParser(args[0]);
         event.sender.send('opt-reply', ret)
     })
     $('#controlObjs').attr('style','height:'+(remote.getCurrentWindow().getBounds().height - 50) + 'px;width='+ remote.getCurrentWindow().getBounds().width + 'px;')
+    document.getElementsByClassName('menubar-menu-title')[0].innerHTML = '<i class="fa fa-wrench fa-lg" aria-hidden="true" style="opacity:0.6"></i>&nbsp;DevTools'
+    document.getElementsByClassName('menubar-menu-title')[1].innerHTML = '<i class="fa fa-book fa-lg" aria-hidden="true" style="opacity:0.6"></i>&nbsp;Help'
+
 }
 
 function drawXYArray(xArray, yArray) {
     $("#drawThings").append(
-        '<canvas id="fxdrawerObj' + objIndex + '" width="' + remote.getCurrentWindow().getBounds().width + 'px" height="' + (remote.getCurrentWindow().getBounds().height - 50) + 'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
-    let canvas = document.getElementById('fxdrawerObj' + objIndex);
+        '<canvas id="' + objIndex + '" width="' + remote.getCurrentWindow().getBounds().width + 'px" height="' + (remote.getCurrentWindow().getBounds().height - 50) + 'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
+    let canvas = document.getElementById('' + objIndex);
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = fillColor;
     ctx.strokeStyle = strokeColor;
@@ -127,8 +151,8 @@ function drawXYArray(xArray, yArray) {
 
 function drawCircle(x, y, r) {
     $("#drawThings").append(
-        '<canvas id="fxdrawerObj' + objIndex + '" width="' + remote.getCurrentWindow().getBounds().width + 'px" height="' + (remote.getCurrentWindow().getBounds().height - 50) + 'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
-    let canvas = document.getElementById('fxdrawerObj' + objIndex);
+        '<canvas id="' + objIndex + '" width="' + remote.getCurrentWindow().getBounds().width + 'px" height="' + (remote.getCurrentWindow().getBounds().height - 50) + 'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
+    let canvas = document.getElementById('' + objIndex);
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = fillColor;
     ctx.strokeStyle = strokeColor;

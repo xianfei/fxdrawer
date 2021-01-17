@@ -4,12 +4,15 @@ const {TouchBarLabel, TouchBarButton, TouchBarSpacer} = TouchBar
 var net = require('net');
 var HOST = '127.0.0.1';
 var PORT = 6666;
-var mainWindow;
-var docWindow;
 var isDevToolsOpen = false;
+
+const isMac = process.platform === 'darwin'
+
+
 
 async function netParser() {
     net.createServer(function (sock) {
+        var mainWindow;
         // 我们获得一个连接 - 该连接自动关联一个socket对象
         console.log('CONNECTED: ' +
             sock.remoteAddress + ':' + sock.remotePort);
@@ -21,7 +24,7 @@ async function netParser() {
             var ret = ''; // 返回值字符串
             switch (obj.action) {
                 case 'init':
-                    createWindow(obj.width, obj.height + 30);
+                    mainWindow = createWindow(obj.width, obj.height + 30, mainWindow);
                     // 等待窗口加载完成
                     await new Promise(resolve => mainWindow.webContents.once('dom-ready', resolve));
                     break;
@@ -46,20 +49,40 @@ async function netParser() {
         // 为这个socket实例添加一个"close"事件处理函数
         sock.on('close', function () {
             console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
-            app.quit()
+            mainWindow.close()
         });
 
     }).listen(PORT, HOST);
 }
 
 function showDoc(){
-    docWindow = new BrowserWindow({
+    var docWindow;
+    if(isMac)docWindow = new BrowserWindow({
         width: 1200,
         height: 700,
-    })
+        titleBarStyle: 'hidden',
+        webPreferences: {
+            enableRemoteModule: true,
+            nodeIntegration: true,
+        }
+    });
+    else
+        docWindow = new BrowserWindow({
+            width: 1200,
+            height: 700,
+            frame: false,
+            webPreferences: {
+                enableRemoteModule: true,
+                nodeIntegration: true,
+            }
+        })
 
     // and load the index.html of the app.
     docWindow.loadFile('readme.html')
+
+    // docWindow.toggleDevTools()
+
+    if(!isMac)return
 
     docWindow.setTouchBar(new TouchBar({
         items: [
@@ -75,7 +98,7 @@ function showDoc(){
     }))
 }
 
-function toggleDevTools(){
+function toggleDevTools(mainWindow){
     if(!isDevToolsOpen) {
         mainWindow.setSize(mainWindow.getBounds().width+400, mainWindow.getBounds().height)
         mainWindow.webContents.openDevTools()
@@ -86,12 +109,21 @@ function toggleDevTools(){
     isDevToolsOpen =!isDevToolsOpen
 }
 
-function createWindow(w, h) {
+function createWindow(w, h, mainWindow) {
     // Create the browser window.
-    mainWindow = new BrowserWindow({
+    if(isMac) mainWindow = new BrowserWindow({
         width: w,
         height: h,
-        autoHideMenuBar: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            enableRemoteModule: true
+        }
+    })
+    else mainWindow = new BrowserWindow({
+        width: w,
+        height: h,
+        frame: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -102,32 +134,50 @@ function createWindow(w, h) {
     // and load the index.html of the app.
     mainWindow.loadFile('index.html')
 
-    let template = [
+    var template
+    if(isMac)template = [
         {
-            label:'fxDrawer',
-            submenu: [{
-                label: 'Toggle Dev Tools',
-                accelerator: 'CmdOrCtrl+Alt+D',
-                click: toggleDevTools
-            },{
-                label: 'Open fxDrawer Document',
-                accelerator: 'CmdOrCtrl+Alt+H',
-                click: showDoc
-            },{
-                type: 'separator'
-            },{
-                label: 'fxDrawer by xianfei',
-                enabled: false
-            }]
+            label: app.name,
+            submenu: [
+                { role: 'about' },
+                { type: 'separator' },
+                { role: 'services' },
+                { type: 'separator' },
+                { role: 'quit' }
+            ]
+        },
+        {
+            label: 'DevTools',
+            submenu: [
+                {
+                    label: 'ToggleDevTools',
+                    click: toggleDevTools
+                }
+            ]
+        },{
+            label: 'Help',
+            submenu: [
+                {
+                    label: 'ShowDoc',
+                    click: showDoc
+                }
+            ]
+        }
+    ];else template = [
+        {
+            label: 'DevTools',
+            click: ()=>{toggleDevTools(mainWindow)}
+        },{
+            label: 'ShowDoc',
+            click: showDoc
         }
     ]
-
     const {Menu} = require('electron');
     let menu = Menu.buildFromTemplate(template)
     Menu.setApplicationMenu(menu)
 
     // TouchBar API only works on macOS devices with a TouchBar.
-    if (process.platform !== 'darwin') return
+    if (process.platform !== 'darwin') return mainWindow;
 
     // 附赠彩蛋：老虎机
 
@@ -228,6 +278,8 @@ function createWindow(w, h) {
     })
 
     mainWindow.setTouchBar(touchBar)
+
+    return mainWindow;
 
 
     // Open the DevTools.

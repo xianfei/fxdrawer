@@ -8,5 +8,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "custom-electron-titlebar": "^3.2.6",
+    "electron-find": "^1.0.6"
+  }
 }
