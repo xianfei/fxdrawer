@@ -1,3 +1,6 @@
+# output bins
+OutApp/
+
 # Logs
 logs
 *.log
