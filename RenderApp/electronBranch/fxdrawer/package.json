@@ -5,7 +5,11 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "package": "electron-packager ./ fxdrawer --platform=win32 --arch=x64 --out ./OutApp --app-version 0.1.1"
+    "package": "npm-run-all package:*",
+    "package:win32": "electron-packager ./ fxdrawer --platform=win32 --arch=ia32 --out ./OutApp --icon=app-icon/win/app.ico",
+    "package:win64": "electron-packager ./ fxdrawer --platform=win32 --arch=x64 --out ./OutApp --icon=app-icon/win/app.ico",
+    "package:mac64": "electron-packager ./ fxdrawer --platform=darwin --arch=x64 --out ./OutApp --icon=app-icon/mac/app.icns",
+    "package:macarm": "electron-packager ./ fxdrawer --platform=darwin --arch=arm64 --out ./OutApp --icon=app-icon/mac/app.icns"
   },
   "keywords": [],
   "author": "",
