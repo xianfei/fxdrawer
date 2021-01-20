@@ -8,19 +8,20 @@ window.$ = window.jQuery = require("./jquery.js");
 
 // var titlebar;
 
-const {ipcRenderer, remote} = require('electron')
+const { ipcRenderer, remote } = require('electron')
 
 var sudo = require('sudo-prompt');
+
+var exec = require('child_process');
 var options = {
-  name: 'Electron',
-  icns: '/Applications/Electron.app/Contents/Resources/Electron.icns', // (optional)
+  name: 'Electron'
 };
 
 var fxPath;
 
 window.onload = function () {
-    if(process.platform !== 'darwin'){
-        document.getElementById('btns').innerHTML = String.raw`<button class="mdui-btn mdui-btn-icon"
+  if (process.platform !== 'darwin') {
+    document.getElementById('btns').innerHTML = String.raw`<button class="mdui-btn mdui-btn-icon"
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;right: 5px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
       onclick="remote.getCurrentWindow().close()" title="close"><i class="mdui-icon material-icons" style="font-size: 20px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">close</i></button>
       <button class="mdui-btn mdui-btn-icon"
@@ -37,12 +38,12 @@ window.onload = function () {
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;left: 40px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
       onclick="ipcRenderer.send('showdoc', '')" title="Show Document"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i></button>
       `
-      maximizeBtn()
-    document.getElementById('maxbtn').addEventListener('click', ()=>{
+    maximizeBtn()
+    document.getElementById('maxbtn').addEventListener('click', () => {
       maximizeBtn()
     })
-    }else{
-        document.getElementById('btns').innerHTML = String.raw`
+  } else {
+    document.getElementById('btns').innerHTML = String.raw`
       <button class="mdui-btn mdui-btn-icon"
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;right: 5px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
       onclick="ipcRenderer.send('devtools', '')" title="Toggle Dev Tools"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">dvr</i></button>
@@ -50,51 +51,101 @@ window.onload = function () {
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;right: 40px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
       onclick="ipcRenderer.send('showdoc', '')" title="Show Document"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i></button>
       `
+  }
+
+  ipcRenderer.on('connect-broke', async function (event, ...args) {
+    document.getElementById('connectbroke').innerText = ' 连接已断开'
+  })
+
+
+
+  // 监听绘图请求
+  ipcRenderer.on('opt-request', async function (event, ...args) {
+    event.sender.send('opt-reply', '')
+  })
+  if (process.platform == 'win32')
+    fxPath = remote.getGlobal('sharedObject').prop1[0].substring(0, remote.getGlobal('sharedObject').prop1[0].lastIndexOf('\\'));
+  else fxPath = remote.getGlobal('sharedObject').prop1[0].substring(0, remote.getGlobal('sharedObject').prop1[0].lastIndexOf('/'));
+  $('#dir').text(fxPath)
+
+  var pathStr;
+
+  
+
+
+  if (process.platform == 'win32') {
+    pathStr = process.env['path']
+    if (pathStr.indexOf(fxPath) != -1) {
+      $('#result').text('已经在Path中了。')
+      $('#addtopathBtn').hide()
+    } else {
+      $('#result').text('不在Path中。')
     }
+    console.log(pathStr)
 
-    ipcRenderer.on('connect-broke', async function (event, ...args) {
-        document.getElementById('connectbroke').innerText = ' 连接已断开'
-    })
-    
-
-    
-    // 监听绘图请求
-    ipcRenderer.on('opt-request', async function (event, ...args) {
-        event.sender.send('opt-reply', '')
-    })
-    if(process.platform=='win32')
-        fxPath = remote.getGlobal('sharedObject').prop1[0].substring(0,remote.getGlobal('sharedObject').prop1[0].lastIndexOf('\\'));
-    else fxPath = remote.getGlobal('sharedObject').prop1[0].substring(0,remote.getGlobal('sharedObject').prop1[0].lastIndexOf('/'));
-    $('#dir').text(fxPath)
-
-    if(process.env['path'].indexOf(fxPath)!=-1){
+  }
+  else {
+    exec('echo $PATH', (err, stdout, stderr) => {
+      if(err) {
+          console.log(err);
+          return;
+      }
+      pathStr = stdout;
+      if (pathStr.indexOf(fxPath) != -1) {
         $('#result').text('已经在Path中了。')
         $('#addtopathBtn').hide()
-    }else{
+      } else {
         $('#result').text('不在Path中。')
-    }
+      }
+      console.log(pathStr)
+  })
+  }
 
-    $('#addtopathBtn').on('click',addToPath)
+
+  
+
+  $('#addtopathBtn').on('click', addToPath)
 }
 
-function addToPath(){
+function addToPath() {
+  if (process.platform == 'win32') {
     sudo.exec('setx PATH "%PATH%;'+fxPath+'" /m && setx FXDRAWER_HOME "'+fxPath+'" /m', options,
   function(error, stdout, stderr) {
-    if (error) throw error;
+    if (error) {
+      console.log(error);
+      exec('setx PATH "%PATH%;'+fxPath+'" && setx FXDRAWER_HOME "'+fxPath+'"', (err, stdout, stderr) => {
+        if(err) {
+            console.log(err);
+            return;
+        }
+        $('#stdout').html(stdout + '<br>添加成功后，您需要重新打开fxDrawer程序才可生效');
+    })
+    return;
+    }
     $('#stdout').html(stdout+'<br>添加成功后，您需要重新打开fxDrawer程序才可生效');
   }
 );
+  } else if (process.platform == 'darwin') {
+    sudo.exec('echo "' + fxPath +'" > /etc/paths.d/fxdrawer', options,
+    function (error, stdout, stderr) {
+      if (error) throw error;
+      $('#stdout').html(stdout + '<br>添加成功后，您需要重新打开fxDrawer程序才可生效');
+    }
+  );
+  } else {
+    $('#stdout').html('该功能暂时只支持Windows和macOS');
+  }
 }
 
 
-var isMax=true;
-function maximizeBtn(){
-  if(isMax){
+var isMax = true;
+function maximizeBtn() {
+  if (isMax) {
     remote.getCurrentWindow().restore();
     document.getElementById('maxbtn').innerHTML = '<i class="mdui-icon material-icons" style="font-size: 20px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">fullscreen</i>';
-  }else{
+  } else {
     remote.getCurrentWindow().maximize();
     document.getElementById('maxbtn').innerHTML = '<i class="mdui-icon material-icons" style="font-size: 20px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">fullscreen_exit</i>';
   }
-  isMax=!isMax
+  isMax = !isMax
 }

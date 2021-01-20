@@ -34,7 +34,7 @@ function fxStart(){
         }
     }
     var helloWindow;
-    if (isMac) helloindow = new BrowserWindow({
+    if (isMac) helloWindow = new BrowserWindow({
         width: 700,
         height: 400,
         titleBarStyle: 'hidden',
@@ -121,12 +121,13 @@ async function netParser() {
         if (err.code == 'EADDRINUSE') {
             find('port', PORT)
                 .then(function (list) {
+                    if(list[0].name.indexOf('fxdrawer')==-1){
                     if (!list.length) {
                         dialog.showErrorBox('TCP监听错误', '端口被占用？但未找到使用端口'+PORT+'的程序')
                     } else {
                         dialog.showErrorBox('TCP监听错误', '端口'+PORT+'被程序 '+list[0].name+' 占用，您可以在任务管理器中杀死它！')
                         // console.log();
-                    }
+                    }}
                     app.quit()
                 })
             
