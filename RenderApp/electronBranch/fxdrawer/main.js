@@ -17,6 +17,7 @@ global.sharedObject = {prop1: process.argv}
 app.whenReady().then(fxStart)
 
 function fxStart(){
+    // console.log(process)
     for (let index = 0; index < process.argv.length; index++) {
         if(process.argv[index]==='listen'){
             index++;
@@ -67,11 +68,12 @@ function fxStart(){
 
 
 async function netParser() {
+    try{
     let tcpConnect = net.createServer(function (sock) {
+        var killpid = -1;
         var mainWindow;
         // 我们获得一个连接 - 该连接自动关联一个socket对象
-        console.log('CONNECTED: ' +
-            sock.remoteAddress + ':' + sock.remotePort);
+        //console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
 
         // 为这个socket实例添加一个"data"事件处理函数
         sock.on('data', async function (data) {
@@ -80,7 +82,9 @@ async function netParser() {
             var ret = ''; // 返回值字符串
             switch (obj.action) {
                 case 'init':
-                    mainWindow = createWindow(obj.width, obj.height + 30, mainWindow);
+                    mainWindow = createWindow(obj.width, obj.height + 30);
+                    if(obj.hasOwnProperty('killwhenclose')) killpid = obj.killwhenclose;
+                    mainWindow.on('close', function() {if(killpid!=-1)try{process.kill(killpid);}catch(err){}});
                     // 等待窗口加载完成
                     await new Promise(resolve => mainWindow.webContents.once('did-finish-load', resolve));
                     break;
@@ -104,15 +108,25 @@ async function netParser() {
 
         // 为这个socket实例添加一个"close"事件处理函数
         sock.on('close', function () {
-            console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
+            // console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
             // mainWindow.close()
+            try{
+                killpid=-1;
             mainWindow.webContents.send('connect-broke', '')
+        }catch(err){
+                
+        }
         });
 
         sock.on('error', function (err) {
             // mainWindow.close()
             if (err.code == 'ECONNRESET') 
+            try{
+                killpid=-1;
             mainWindow.webContents.send('connect-broke', '')
+            }catch(err){
+                
+            }
         });
 
     }).listen(PORT, HOST);
@@ -134,6 +148,9 @@ async function netParser() {
             
         }
     });
+}catch(err){
+    console.log(err.message)
+}
 
 }
 
@@ -191,8 +208,9 @@ function toggleDevTools(mainWindow) {
     isDevToolsOpen = !isDevToolsOpen
 }
 
-function createWindow(w, h, mainWindow) {
+function createWindow(w, h) {
     // Create the browser window.
+    var mainWindow;
     if (isMac) mainWindow = new BrowserWindow({
         width: w,
         height: h,

@@ -12,7 +12,7 @@ const { ipcRenderer, remote } = require('electron')
 
 var sudo = require('sudo-prompt');
 
-var cp = require('child_process');
+var exec = require('child_process');
 var options = {
   name: 'Electron'
 };
@@ -70,7 +70,7 @@ window.onload = function () {
 
   var pathStr;
 
-  
+
 
 
   if (process.platform == 'win32') {
@@ -85,10 +85,10 @@ window.onload = function () {
 
   }
   else {
-    cp.exec('echo $PATH', (err, stdout, stderr) => {
-      if(err) {
-          console.log(err);
-          return;
+    exec('echo $PATH', (err, stdout, stderr) => {
+      if (err) {
+        console.log(err);
+        return;
       }
       pathStr = stdout;
       if (pathStr.indexOf(fxPath) != -1) {
@@ -98,40 +98,40 @@ window.onload = function () {
         $('#result').text('不在Path中。')
       }
       console.log(pathStr)
-  })
+    })
   }
 
 
-  
+
 
   $('#addtopathBtn').on('click', addToPath)
 }
 
 function addToPath() {
   if (process.platform == 'win32') {
-    sudo.exec('setx PATH "%PATH%;'+fxPath+'" /m && setx FXDRAWER_HOME "'+fxPath+'" /m', options,
-  function(error, stdout, stderr) {
-    if (error) {
-      console.log(error);
-      cp.exec('setx PATH "%PATH%;'+fxPath+'" && setx FXDRAWER_HOME "'+fxPath+'"', (err, stdout, stderr) => {
-        if(err) {
-            console.log(err);
-            return;
+    sudo.exec('setx PATH "' + fxPath + ';%PATH%" /m && setx FXDRAWER_HOME "' + fxPath + '" /m', options,
+      function (error, stdout, stderr) {
+        if (error) {
+          console.log(error);
+          exec('setx PATH "' + fxPath + ';%PATH%" && setx FXDRAWER_HOME "' + fxPath + '"', (err, stdout, stderr) => {
+            if (err) {
+              console.log(err);
+              return;
+            }
+            $('#stdout').html(stdout + '<br>添加成功后，您需要重新打开fxDrawer程序才可生效');
+          })
+          return;
         }
         $('#stdout').html(stdout + '<br>添加成功后，您需要重新打开fxDrawer程序才可生效');
-    })
-    return;
-    }
-    $('#stdout').html(stdout+'<br>添加成功后，您需要重新打开fxDrawer程序才可生效');
-  }
-);
+      }
+    );
   } else if (process.platform == 'darwin') {
-    sudo.exec('echo "' + fxPath +'" > /etc/paths.d/fxdrawer', options,
-    function (error, stdout, stderr) {
-      if (error) throw error;
-      $('#stdout').html(stdout + '<br>添加成功后，您需要重新打开fxDrawer程序才可生效');
-    }
-  );
+    sudo.exec('echo "' + fxPath + '" > /etc/paths.d/fxdrawer', options,
+      function (error, stdout, stderr) {
+        if (error) throw error;
+        $('#stdout').html(stdout + '<br>添加成功后，您需要重新打开fxDrawer程序才可生效');
+      }
+    );
   } else {
     $('#stdout').html('该功能暂时只支持Windows和macOS');
   }

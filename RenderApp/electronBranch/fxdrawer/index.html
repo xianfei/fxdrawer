@@ -2,198 +2,83 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>fxDrawer</title>
-    <!-- This is tech preview version of fxDrawer with HTML5 -->
-    <link rel="stylesheet" href="./mdui-v1/css/mdui.css">
-    <link rel="stylesheet" href="./font-awesome/css/font-awesome.min.css">
-    <style type="text/css">
+  <meta charset="UTF-8">
+  <title>fxDrawer</title>
+  <!-- This is tech preview version of fxDrawer with HTML5 -->
+  <link rel="stylesheet" href="./mdui-v1/css/mdui.css">
+  <link rel="stylesheet" href="./font-awesome/css/font-awesome.min.css">
+  <style type="text/css">
     body::-webkit-scrollbar {
-    display: none;
-}
-        .box {
-          width: 0px;
-          height: 0px;
-          position: absolute;
-          opacity: 0.5;
-          cursor: move;
-        }
-    
-        .droptarget {
-          float: left;
-          width: 100px;
-          height: 1000px;
-          margin: 15px;
-          padding: 10px;
-          border: 1px solid #aaaaaa;
-        }
-    
-        .coordiv {
-          position: absolute;
-          z-index: 9;
-          top: 28px;
-          right: 0;
-          width: 100%;
-          background:
-            -webkit-linear-gradient(top, transparent 49px, rgba(0, 174, 255, 0.5) 50px),
-            -webkit-linear-gradient(left, transparent 49px, rgba(0, 174, 255, 0.5) 50px);
-          background-size: 50px 50px;
-        }
-      </style>
+      display: none;
+    }
+
+    .box {
+      width: 0px;
+      height: 0px;
+      position: absolute;
+      opacity: 0.5;
+      cursor: move;
+    }
+
+    .droptarget {
+      float: left;
+      width: 100px;
+      height: 1000px;
+      margin: 15px;
+      padding: 10px;
+      border: 1px solid #aaaaaa;
+    }
+
+    .coordiv {
+      position: absolute;
+      z-index: 9;
+      top: 28px;
+      right: 0;
+      width: 100%;
+      background:
+        -webkit-linear-gradient(top, transparent 49px, rgba(0, 174, 255, 0.5) 50px),
+        -webkit-linear-gradient(left, transparent 49px, rgba(0, 174, 255, 0.5) 50px);
+      background-size: 50px 50px;
+    }
+  </style>
 </head>
 
 <body class="mdui-theme-primary-blue mdui-theme-accent-blue">
-    <div id='titlebar'
-        style="text-align:center;position: fixed;right: 0px;top: 0px;width: 100%;height: 28px;-webkit-app-region: drag;z-index: 10;background: #eeeeee;">
-        <font style="line-height:28px;font-family: 'Roboto';font-size: 12px;">fxDrawer</font><font id="connectbroke" style="line-height:28px;font-family: 'Roboto';font-size: 12px;color: #F00;"></font>
-    </div>
-    <div id='btns' style="-webkit-app-region: nodrag;"></div>
-    <div style="inset: 28px 0px 0px; position: absolute; overflow: auto;">
-        <div id="drawThings" style="position:absolute;left:0;top:0px"></div>
-        <div id="controlObjs" style="position:absolute;left:0;top:0px;"></div>
-        
-    </div>
-    <div id="designer" style="inset: 0px 0px 0px; position: absolute; overflow: auto;">
+  <div id='titlebar'
+    style="text-align:center;position: fixed;right: 0px;top: 0px;width: 100%;height: 28px;-webkit-app-region: drag;z-index: 10;background: #eeeeee;">
+    <span style="line-height:28px;font-family: 'Roboto';font-size: 12px;">fxDrawer</span>
+    <span id="connectbroke" style="line-height:28px;font-family: 'Roboto';font-size: 12px;color: #F00;"></span>
+  </div>
+  <div id='btns' style="-webkit-app-region: nodrag;"></div>
+  <div style="inset: 28px 0px 0px; position: absolute; overflow: auto;">
+    <div id="drawThings" style="position:absolute;left:0;top:0px"></div>
+    <div id="controlObjs" style="position:absolute;left:0;top:0px;"></div>
 
-        <script>//框内移动显示坐标
-          function cnvs_getCoordinates(e) {
-            x = e.pageX - e.target.offsetLeft;//不能用clientX,pageX为文档坐标,clientX表示浏览器界面坐标,会随滚动条改变
-            y = e.pageY - e.target.offsetTop;
-            document.getElementById("xycoordinates").innerHTML = "<font>Coordinates: (" + (x) + "," + (y) + ")</font>";
-          }
-          function cnvs_clearCoordinates()//出框后不显示坐标
-          {
-            document.getElementById("xycoordinates").innerHTML = "<font>Coordinates:</font>";
-          }
-        </script>
-        <div id="coordiv" class="coordiv" onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()">
-          <script type="text/javascript">
-            function draginit (e) {
-              e = e || window.event;
-              // startX, startY 为鼠标点击时初始坐标
-              // diffX, diffY 为鼠标初始坐标与 box 左上角坐标之差，用于拖动
-              var startX, startY, diffX, diffY;
-              // 是否拖动，初始为 false
-              var dragging = false;
-      
-              var coordiv = document.getElementById('coordiv');
-      
-              // 鼠标按下
-              document.onmousedown = function (e) {
-                startX = e.pageX;
-                startY = e.pageY;
-      
-                // 如果鼠标在 box 上被按下,坐标判定防止在box之外
-                if (startY <= coordiv.offsetTop + coordiv.offsetHeight && startY >= coordiv.offsetTop && startX >= coordiv.offsetLeft && startX <= coordiv.offsetLeft + coordiv.offsetWidth) {
-                  if (e.target.className.match(/box/)) {
-                    // 允许拖动
-                    dragging = true;
-      
-                    // 设置当前 box 的 id 为 moving_box
-                    if (document.getElementById("moving_box") !== null) {
-                      document.getElementById("moving_box").removeAttribute("id");
-                    }
-                    e.target.id = "moving_box";
-      
-                    // 计算坐标差值
-                    diffX = startX - e.target.offsetLeft;
-                    diffY = startY - e.target.offsetTop;
-                  }
-                  else {
-                    // 在页面创建 box
-                    var active_box = document.createElement("div");
-                    active_box.id = "active_box";
-                    active_box.className = "box";
-                    active_box.style.top = startY + 'px';
-                    active_box.style.left = startX + 'px';
-                    active_box.style.background = '#' + Math.floor(Math.random() * (2 << 23)).toString(16);
-                    document.getElementById("designer").appendChild(active_box);
-                    active_box = null;
-                  }
-                }
-      
-              };
-      
-              // 鼠标移动
-              document.onmousemove = function (e) {
-                if (e.pageY <= coordiv.offsetTop + coordiv.offsetHeight && e.pageY >= coordiv.offsetTop && e.pageX >= coordiv.offsetLeft && e.pageX <= coordiv.offsetLeft + coordiv.offsetWidth) {
-                  // 更新 box 尺寸
-                  if (document.getElementById("active_box") !== null)//如果document中有active_box,就改变box大小
-                  {
-                    var ab = document.getElementById("active_box");
-                    ab.style.width = e.pageX - startX + 'px';
-                    ab.style.height = e.pageY - startY + 'px';
-                  }
-      
-                  // 移动，更新 box 坐标
-                  if (document.getElementById("moving_box") !== null && dragging) {
-                    var mb = document.getElementById("moving_box");
-                    var xy_div = document.getElementById(mb.style.left.substring(0, mb.style.left.length - 2) + mb.style.top.substring(0, mb.style.top.length - 2));
-      
-                    var tmx = e.pageX - diffX;
-                    var tmy = e.pageY - diffY;
-      
-      
-                    if (tmx + mb.offsetWidth <= coordiv.offsetLeft + coordiv.offsetWidth && tmx >= coordiv.offsetLeft && tmy + mb.offsetHeight <= coordiv.offsetTop + coordiv.offsetHeight && tmy >= coordiv.offsetTop) {
-                      mb.style.top = e.pageY - diffY + 'px';
-                      mb.style.left = e.pageX - diffX + 'px';
-      
-                      if (xy_div !== null) {
-                        var new_x = mb.style.left.substring(0, mb.style.left.length - 2);
-                        var new_y = mb.style.top.substring(0, mb.style.top.length - 2);
-                        xy_div.id = new_x + new_y;
-                        new_x -= coordiv.offsetLeft;
-                        new_y -= coordiv.offsetTop;
-                        // var new_r = parseInt(mb.style.width.substring(0,mb.style.width.length-2))+parseInt(new_x)-coordiv.offsetLeft;
-                        // var new_b = parseInt(mb.style.height.substring(0,mb.style.height.length-2))+parseInt(new_y)-coordiv.offsetTop;//"[ left: "+ new_x +", top: "+ new_y + ", right: " + new_r +" , bottom: "+ new_b +" ]";
-                        xy_div.innerHTML = (new_x) + "," + (new_y) + "," + mb.style.width.substring(0, mb.style.width.length - 2) + "," + mb.style.height.substring(0, mb.style.height.length - 2) + '&nbsp;&nbsp;';
-                        //var input_div = document.getElementById("x_y")
-                        //input_div.value=xy_div.innerHTML
-                      }
-                    }
-                  }
-                }
-              };
-      
-              // 鼠标抬起
-              document.onmouseup = function (e) {
-                // 禁止拖动
-                dragging = false;
-                if (document.getElementById("active_box") !== null) {
-                  var ab = document.getElementById("active_box");
-                  ab.removeAttribute("id");
-                  // 如果长宽均小于 3px，移除 box
-                  if (ab.offsetWidth < 10 || ab.offsetHeight < 10) {
-                    document.getElementById("designer").removeChild(ab);
-                  }
-                  if (ab.offsetHeight >= 10 && ab.offsetHeight >= 10) {
-                    var xy_div = document.createElement("font");
-                    xy_div.className = 'designerobj';
-                    xy_div.id = startX.toString() + startY.toString();
-                    document.getElementById("infoBar").appendChild(xy_div);
-                    xy_div.style.color = ab.style.background;
-                    xy_div.innerHTML = (startX - coordiv.offsetLeft ) + "," + (startY - coordiv.offsetTop) + "," + (e.pageX - startX) + "," + (e.pageY - startY) + '&nbsp;&nbsp;';
-                  }
-                }
-              };
-      
-            };
-          </script>
-        </div>
-        <br>
-      
-        <script>
+  </div>
+  <div id="designer" style="inset: 0px 0px 0px; position: absolute; overflow: auto;">
 
-        </script>
-        <div id='infoBar'
-        style="position: fixed;left: 5px;bottom: 20px;width: 100%;height: 28px;z-index: 10;">
-        <div id="xycoordinates"></div>
-        <font>x,y,w,h: </font>
-      </div>
-        
-        </div>
-        <script src='./mdui-v1/js/mdui.js'></script>
-        <script src='./renderer.js'></script>
+    <script>//框内移动显示坐标
+      function cnvs_getCoordinates(e) {
+        x = e.pageX - e.target.offsetLeft;//不能用clientX,pageX为文档坐标,clientX表示浏览器界面坐标,会随滚动条改变
+        y = e.pageY - e.target.offsetTop;
+        document.getElementById("xycoordinates").innerHTML = "<font>Coordinates: (" + (x) + "," + (y) + ")</font>";
+      }
+      function cnvs_clearCoordinates()//出框后不显示坐标
+      {
+        document.getElementById("xycoordinates").innerHTML = "<font>Coordinates:</font>";
+      }
+    </script>
+    <div id="coordiv" class="coordiv" onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()">
+    </div>
+    <br>
+    <div id='infoBar' style="position: fixed;left: 5px;bottom: 20px;width: 100%;height: 28px;z-index: 10;">
+      <div id="xycoordinates"></div>
+      <span>x,y,w,h: </span>
+    </div>
+
+  </div>
+  <script src='./mdui-v1/js/mdui.js'></script>
+  <script src='./renderer.js'></script>
 
 </body>
 
