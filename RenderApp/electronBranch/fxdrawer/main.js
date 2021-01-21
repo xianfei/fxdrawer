@@ -4,31 +4,34 @@ const { TouchBarLabel, TouchBarButton, TouchBarSpacer } = TouchBar
 var net = require('net');
 var HOST = '127.0.0.1';
 var PORT = 6666;
-var isDevToolsOpen = false;
 const versionInfo = '0.1.1';
 
 const isMac = process.platform === 'darwin'
 
 const find = require('find-process');
 
-global.sharedObject = {prop1: process.argv}
+global.sharedObject = { prop1: process.argv }
 
 
 app.whenReady().then(fxStart)
 
-function fxStart(){
+ipcMain.on('showdoc', (event, arg) => {
+    showDoc()
+})
+
+function fxStart() {
     // console.log(process)
     for (let index = 0; index < process.argv.length; index++) {
-        if(process.argv[index]==='listen'){
+        if (process.argv[index] === 'listen') {
             index++;
             PORT = parseInt(process.argv[index++]);
             netParser();
             return;
-        }else if(process.argv[index]==='showdoc'){
+        } else if (process.argv[index] === 'showdoc') {
             showDoc();
             return;
-        }else if(process.argv[index]==='help'){
-            console.log('fxDrawer '+versionInfo+'\n')
+        } else if (process.argv[index] === 'help') {
+            console.log('fxDrawer ' + versionInfo + '\n')
             console.log('Usage: fxdrawer [listen <listenPort>] [showdoc] [help]\n')
             app.quit();
             return;
@@ -45,7 +48,7 @@ function fxStart(){
         }
     });
     else
-    helloWindow = new BrowserWindow({
+        helloWindow = new BrowserWindow({
             width: 700,
             height: 400,
             frame: false,
@@ -54,103 +57,92 @@ function fxStart(){
                 nodeIntegration: true,
             }
         })
-        helloWindow.loadFile('start.html')
-        // helloWindow.toggleDevTools();
-        ipcMain.on('showdoc', (event, arg) => {
-            showDoc()
-        })
-    
-        ipcMain.on('devtools', (event, arg) => {
-            toggleDevTools(helloWindow)
-        })
+    helloWindow.loadFile('start.html')
+    // helloWindow.toggleDevTools();
 }
 
 
 
 async function netParser() {
-    try{
-    let tcpConnect = net.createServer(function (sock) {
-        var killpid = -1;
-        var mainWindow;
-        // 我们获得一个连接 - 该连接自动关联一个socket对象
-        //console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
+    try {
+        let tcpConnect = net.createServer(function (sock) {
+            var killpid = -1;
+            var mainWindow;
+            // 我们获得一个连接 - 该连接自动关联一个socket对象
+            console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
 
-        // 为这个socket实例添加一个"data"事件处理函数
-        sock.on('data', async function (data) {
-            // console.log('DATA ' + sock.remoteAddress + ': ' + data.subarray(2).toString('utf8'));
-            const obj = JSON.parse(data.subarray(2).toString());
-            var ret = ''; // 返回值字符串
-            switch (obj.action) {
-                case 'init':
-                    mainWindow = createWindow(obj.width, obj.height + 30);
-                    if(obj.hasOwnProperty('killwhenclose')) killpid = obj.killwhenclose;
-                    mainWindow.on('close', function() {if(killpid!=-1)try{process.kill(killpid);}catch(err){}});
-                    // 等待窗口加载完成
-                    await new Promise(resolve => mainWindow.webContents.once('did-finish-load', resolve));
-                    break;
-                case 'exit':
-                    app.quit()
-                    break;
-                default:
-                    mainWindow.webContents.send('opt-request', data.subarray(2).toString())
-                    // 等待事件结束
-                    await new Promise(function (resolve) {
+            // 为这个socket实例添加一个"data"事件处理函数
+            sock.on('data', function (data) {
+                // console.log('DATA ' + sock.remoteAddress + ': ' + data.subarray(2).toString('utf8'));
+                const obj = JSON.parse(data.subarray(2).toString());
+                switch (obj.action) {
+                    case 'init':
+                        mainWindow = createWindow(obj.width, obj.height + 30);
+                        if (obj.hasOwnProperty('killwhenclose')) killpid = obj.killwhenclose;
+                        mainWindow.on('close', function () { if (killpid != -1) try { process.kill(killpid); } catch (err) { } });
+                        // 等待窗口加载完成
+                        mainWindow.webContents.once('did-finish-load', function () { sock.write('00ok'); });
+                        break;
+                    case 'exit':
+                        app.quit()
+                        break;
+                    default:
+                        mainWindow.webContents.send('opt-request', data.subarray(2).toString())
+                        // 等待事件结束
                         ipcMain.once('opt-reply', function (event, optRet) {
-                            ret += optRet.toString()
-                            resolve();
+                                sock.write('00ok' + optRet.toString());
                         })
-                    });
-                    break;
+                }
+            });
+
+            // 为这个socket实例添加一个"close"事件处理函数
+            sock.on('close', function () {
+                // console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
+                // mainWindow.close()
+                try {
+                    killpid = -1;
+                    mainWindow.webContents.send('connect-broke', '')
+                } catch (err) {
+
+                }
+            });
+
+            sock.on('error', function (err) {
+                // mainWindow.close()
+                if (err.code == 'ECONNRESET')
+                    try {
+                        killpid = -1;
+                        mainWindow.webContents.send('connect-broke', '')
+                    } catch (err) {
+
+                    }
+            });
+
+        });
+
+        tcpConnect.listen(PORT, HOST);
+
+        tcpConnect.on('error', function (err) {
+            if (err.code == 'EADDRINUSE') {
+                find('port', PORT)
+                    .then(function (list) {
+                        if (list[0].name.indexOf('fxdrawer') == -1) {
+                            if (!list.length) {
+                                dialog.showErrorBox('TCP监听错误', '端口被占用？但未找到使用端口' + PORT + '的程序')
+                            } else {
+                                dialog.showErrorBox('TCP监听错误', '端口' + PORT + '被程序 ' + list[0].name + ' 占用，您可以在任务管理器中杀死它！')
+                                // console.log();
+                            }
+                        }
+                        app.quit()
+                    })
+
+
             }
-            // 回发该数据，客户端将收到来自服务端的数据
-            sock.write('00ok' + ret);
         });
-
-        // 为这个socket实例添加一个"close"事件处理函数
-        sock.on('close', function () {
-            // console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
-            // mainWindow.close()
-            try{
-                killpid=-1;
-            mainWindow.webContents.send('connect-broke', '')
-        }catch(err){
-                
-        }
-        });
-
-        sock.on('error', function (err) {
-            // mainWindow.close()
-            if (err.code == 'ECONNRESET') 
-            try{
-                killpid=-1;
-            mainWindow.webContents.send('connect-broke', '')
-            }catch(err){
-                
-            }
-        });
-
-    }).listen(PORT, HOST);
-
-    tcpConnect.on('error', function (err) {
-        if (err.code == 'EADDRINUSE') {
-            find('port', PORT)
-                .then(function (list) {
-                    if(list[0].name.indexOf('fxdrawer')==-1){
-                    if (!list.length) {
-                        dialog.showErrorBox('TCP监听错误', '端口被占用？但未找到使用端口'+PORT+'的程序')
-                    } else {
-                        dialog.showErrorBox('TCP监听错误', '端口'+PORT+'被程序 '+list[0].name+' 占用，您可以在任务管理器中杀死它！')
-                        // console.log();
-                    }}
-                    app.quit()
-                })
-            
-            
-        }
-    });
-}catch(err){
-    console.log(err.message)
-}
+    } catch (err) {
+        console.log(err.message)
+    }
 
 }
 
@@ -197,17 +189,6 @@ function showDoc() {
     }))
 }
 
-function toggleDevTools(mainWindow) {
-    if (!isDevToolsOpen) {
-        mainWindow.setSize(mainWindow.getBounds().width + 400, mainWindow.getBounds().height)
-        mainWindow.webContents.openDevTools()
-    } else {
-        mainWindow.setSize(mainWindow.getBounds().width - 400, mainWindow.getBounds().height)
-        mainWindow.webContents.closeDevTools()
-    }
-    isDevToolsOpen = !isDevToolsOpen
-}
-
 function createWindow(w, h) {
     // Create the browser window.
     var mainWindow;
@@ -234,15 +215,6 @@ function createWindow(w, h) {
 
     // and load the index.html of the app.
     mainWindow.loadFile('index.html')
-
-    ipcMain.on('showdoc', (event, arg) => {
-        showDoc()
-    })
-
-    ipcMain.on('devtools', (event, arg) => {
-        toggleDevTools(mainWindow)
-    })
-
 
     var template
     if (isMac) template = [

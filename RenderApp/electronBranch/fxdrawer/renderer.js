@@ -113,9 +113,9 @@ async function guiParser(jsonStr) {
       case 'show':
         switch (obj["object"]) {
           case 'filechooser':
-            return remote.dialog.showOpenDialogSync();
+            return remote.dialog.showOpenDialogSync().toString();
           case 'savefile':
-            return remote.dialog.showSaveDialogSync();
+            return remote.dialog.showSaveDialogSync().toString();
         }break;
       case 'get':
         switch (obj["object"]) {
@@ -176,6 +176,19 @@ async function guiParser(jsonStr) {
   }
 }
 
+var isDevToolsOpen = false;
+
+function toggleDevTools(mainWindow) {
+  if (!isDevToolsOpen) {
+      mainWindow.setSize(mainWindow.getBounds().width + 400, mainWindow.getBounds().height)
+      mainWindow.webContents.openDevTools()
+  } else {
+      mainWindow.setSize(mainWindow.getBounds().width - 400, mainWindow.getBounds().height)
+      mainWindow.webContents.closeDevTools()
+  }
+  isDevToolsOpen = !isDevToolsOpen
+}
+
 window.onload = function (e) {
   draginit(e)
   // 非macos平台上 标题栏 六个按钮的HTML
@@ -192,7 +205,7 @@ window.onload = function (e) {
 
       <button class="mdui-btn mdui-btn-icon"
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;left: 5px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
-      onclick="ipcRenderer.send('devtools', '')" title="Toggle Dev Tools"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">dvr</i></button>
+      onclick="toggleDevTools(remote.getCurrentWindow())" title="Toggle Dev Tools"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">dvr</i></button>
       <button class="mdui-btn mdui-btn-icon"
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;left: 40px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
       onclick="ipcRenderer.send('showdoc', '')" title="Show Document"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i></button>
@@ -209,7 +222,7 @@ window.onload = function (e) {
     document.getElementById('btns').innerHTML = String.raw`
       <button class="mdui-btn mdui-btn-icon"
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;right: 5px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
-      onclick="ipcRenderer.send('devtools', '')" title="Toggle Dev Tools"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">dvr</i></button>
+      onclick="toggleDevTools(remote.getCurrentWindow())" title="Toggle Dev Tools"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">dvr</i></button>
       <button class="mdui-btn mdui-btn-icon"
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;right: 40px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
       onclick="ipcRenderer.send('showdoc', '')" title="Show Document"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i></button>
