@@ -13,20 +13,6 @@ const find = require('find-process');
 global.sharedObject = { prop1: process.argv }
 
 
-var isDevToolsOpen = false;
-
-function toggleDevTools(mainWindow) {
-  if (!isDevToolsOpen) {
-      mainWindow.setSize(mainWindow.getBounds().width + 400, mainWindow.getBounds().height)
-      mainWindow.webContents.openDevTools()
-  } else {
-      mainWindow.setSize(mainWindow.getBounds().width - 400, mainWindow.getBounds().height)
-      mainWindow.webContents.closeDevTools()
-  }
-  isDevToolsOpen = !isDevToolsOpen
-}
-
-
 app.whenReady().then(fxStart)
 
 ipcMain.on('showdoc', (event, arg) => {
@@ -72,9 +58,6 @@ function fxStart() {
             }
         })
     helloWindow.loadFile('start.html')
-    ipcMain.on('devtools', (event, arg) => {
-        toggleDevTools(helloWindow)
-     })
     // helloWindow.toggleDevTools();
 }
 
@@ -106,10 +89,9 @@ async function netParser() {
                     default:
                         mainWindow.webContents.send('opt-request', data.subarray(2).toString())
                         // 等待事件结束
-                        ipcMain.once('opt-reply', function (event, ...optRet) {
+                        ipcMain.once('opt-reply-'+mainWindow.id, function (event, optRet) {
                             // console.log('opt' + optRet + '  mainid'+mainWindow.id)
-                            if(optRet[1]==mainWindow.id)
-                                sock.write('00ok' + optRet[0]);
+                                sock.write('00ok' + optRet);
                         })
                 }
             });
@@ -235,10 +217,6 @@ function createWindow(w, h) {
     // and load the index.html of the app.
     mainWindow.loadFile('index.html')
 
-    ipcMain.on('devtools', (event, arg) => {
-        toggleDevTools(mainWindow)
-     })
-
     var template
     if (isMac) template = [
         {
@@ -256,7 +234,7 @@ function createWindow(w, h) {
             submenu: [
                 {
                     label: 'ToggleDevTools',
-                    click: () => { toggleDevTools(mainWindow) }
+                    click: () => { mainWindow.webContents.send('toggle-devtools', '') }
                 }
             ]
         }, {
@@ -271,7 +249,7 @@ function createWindow(w, h) {
     ]; else template = [
         {
             label: 'DevTools',
-            click: () => { toggleDevTools(mainWindow) }
+            click: () => {  mainWindow.webContents.send('toggle-devtools', '') }
         }, {
             label: 'ShowDoc',
             click: showDoc
@@ -353,7 +331,7 @@ function createWindow(w, h) {
         new TouchBarButton({
             label: '🛠 DevTools',
             backgroundColor: '#645922',
-            click: () => { toggleDevTools(mainWindow) }
+            click: () => {  mainWindow.webContents.send('toggle-devtools', '') }
         }),
         new TouchBarButton({
             label: '🤷🏼 Close',

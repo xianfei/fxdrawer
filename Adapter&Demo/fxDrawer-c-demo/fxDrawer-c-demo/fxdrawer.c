@@ -330,7 +330,7 @@ assert(0);}
 
 int sendJson(cJSON * jsonObj);
 
-const char* fxServer = "localhost";
+char fxServer[40] = "localhost";
 int fxPort = 6666;
 
 int sd; // a descriptor referencing the socket
@@ -353,7 +353,7 @@ int sendJson(cJSON* jsonObj) {
   send(sd, buf, j, 0); // send message
   memset(buf, 0, BUFFLEN); // reset buffer
   recv(sd, buf, sizeof(buf), 0); // receive returned message (cause blocking)
-#if 1
+#if 0
   printf("%s\n", buf + 2); // output received message
 #endif
   return 0;
@@ -370,7 +370,7 @@ int closeDrawer() {
   WSACleanup();
 #endif
   return 0;
-};
+}
 
 struct Color {
   int useW;
@@ -380,7 +380,17 @@ struct Color {
   double width;
 } colorSet,strokeColor;
 
+int isKillAfterCloseWindow = 1;
 
+void fxSetKillAfterCloseWindow(int isIt) {
+    isKillAfterCloseWindow = isIt;
+}
+
+int isCloseOnBroke = 0;
+
+void fxSetCloseOnBroke(int isIt) {
+    isCloseOnBroke = isIt;
+}
 
 int initDrawer(int width, int height) {
   colorSet.r = 0;
@@ -452,11 +462,28 @@ int initDrawer(int width, int height) {
   cJSON_AddNumberToObject(jsonObj, "width", width);
   cJSON_AddNumberToObject(jsonObj, "height", height);
 #ifdef _WIN32
-  cJSON_AddNumberToObject(jsonObj, "killwhenclose", GetCurrentProcessId());
+  if(isKillAfterCloseWindow)
+    cJSON_AddNumberToObject(jsonObj, "killwhenclose", GetCurrentProcessId());
 #endif
+  if(isCloseOnBroke)
+      cJSON_AddNumberToObject(jsonObj, "closeOnBroke", 1);
   sendJson(jsonObj);
   cJSON_Delete(jsonObj);
-  return 0;
+  return sd;
+}
+
+void fxSetPort(int port) {
+    fxPort = port;
+}
+
+// 设置要连接的fxDrawer端口号，默认127.0.0.1
+void fxSetHost(const char* host) {
+    strcpy(fxServer, host);
+}
+
+// 设置当前使用的Socket描述号，默认由initDrawer函数赋值，可在多窗口时使用
+void fxSetSd(int sd_) {
+    sd = sd_;
 }
 
 void setColor(int r, int g, int b, double a) {
@@ -481,8 +508,9 @@ void setColorW(const char* color) {
     strcpy(colorSet.colorW,color);
 }
 
-void setStrokeW(const char* color) {
+void setStrokeW(const char* color, double width) {
     strokeColor.useW = 1;
+    strokeColor.width = width;
     strcpy(strokeColor.colorW, color);
 }
 
@@ -640,12 +668,11 @@ objID putText(int x, int y, const char* stringContext, double size) {
   return id;
 }
 
-int showChooseDialog(const char* title, const char* stringContext, const char* options) {
+int showChooseDialog(const char* stringContext, const char* options) {
   cJSON* jsonObj;
   jsonObj = cJSON_CreateObject();
   cJSON_AddStringToObject(jsonObj, "action", "show");
   cJSON_AddStringToObject(jsonObj, "object", "dialog");
-  cJSON_AddStringToObject(jsonObj, "title", title);
   cJSON_AddStringToObject(jsonObj, "str", stringContext);
   cJSON_AddStringToObject(jsonObj, "option", options);
   sendJson(jsonObj);
@@ -665,11 +692,12 @@ void chooseFile(char* stringBuffer) {
   if (buf[2] == 'o')strcpy(stringBuffer, buf + 4);
 }
 
-void showInputDialog(char* stringBuffer) {
+void showInputDialog(const char* hintContext, char* stringBuffer) {
     cJSON* jsonObj;
     jsonObj = cJSON_CreateObject();
     cJSON_AddStringToObject(jsonObj, "action", "show");
     cJSON_AddStringToObject(jsonObj, "object", "input");
+    cJSON_AddStringToObject(jsonObj, "hint", hintContext);
     sendJson(jsonObj);
     cJSON_Delete(jsonObj);
     if (buf[2] == 'o')strcpy(stringBuffer, buf + 4);

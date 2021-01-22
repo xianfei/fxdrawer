@@ -87,11 +87,10 @@ objID drawPolygon(int numberOfPoints, int *xArray, int *yArray);
 objID putText(int x,int y,const char* stringContext,double size);
 
 // 弹出选择对话框: 用于创建一个选择对话框，接受参数为标题、内容及选项，其中选项之间用|分隔。返回值为选项的编号-1，从0开始，直接关闭也返回0。
-// title: 标题
 // stringContext: 提示文本
 // options: 选项，用|分隔，如无需选项可传入NULL或空串
 // 返回值：选项
-int showChooseDialog(const char* title,const char* stringContext,const char* options);
+int showChooseDialog(const char* stringContext,const char* options);
 
 // 弹出文件选择窗口: 用于选择文件，接受参数为存放文件路径字符串缓冲区指针。
 //  stringBuffer : （作为返回值） 文件目录字符串
@@ -102,8 +101,9 @@ void chooseFile(char* stringBuffer);
 void chooseSaveFile(char* stringBuffer);
 
 // 弹出输入对话框: 可以输入一行或多行文本
+// hintContext: 提示字符串
 // stringBuffer: （作为返回值）用于存放输入的内容
-void showInputDialog(char* stringBuffer);
+void showInputDialog(const char* hintContext, char* stringBuffer);
 
 // 用于改变文本框、输入框或按钮的文本内容，接受参数为需要改变的对象引用ID及文字。
 // id : 需要改变文本的对象id
@@ -174,6 +174,21 @@ objID putImage(int x, int y, int width, int height,const char* pathString);
 // height : 放置输入框的长度
 // 返回值：objID
 objID putInputBox(int x, int y, int width, int height, const char* type);
+
+// 设置要连接的fxDrawer端口号，默认6666
+void fxSetPort(int port);
+
+// 设置要连接的fxDrawer端口号，默认127.0.0.1
+void fxSetHost(const char* host);
+
+// 设置当前使用的Socket描述号，默认由initDrawer函数赋值，可在多窗口时使用
+void fxSetSd(int sd);
+
+// 设置是否在窗口关闭后杀死调用者 默认为true或1
+void fxSetKillAfterCloseWindow(int isIt);
+
+// 设置是否在调用者断开连接后窗口关闭 默认为false或0
+void fxSetCloseOnBroke(int isIt);
 
 
 #ifdef __cplusplus

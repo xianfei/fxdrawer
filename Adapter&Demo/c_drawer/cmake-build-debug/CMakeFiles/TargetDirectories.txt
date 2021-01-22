@@ -1,3 +1,0 @@
-/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/xianfei/OneDrive - bupt.edu.cn/大创/未命名文件夹/c_drawer/cmake-build-debug/CMakeFiles/c_drawer.dir
