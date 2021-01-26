@@ -6,7 +6,6 @@ window.$ = window.jQuery = require("./jquery.js");
 
 const { ipcRenderer, remote } = require('electron')
 
-let objMap = new Map();
 var objIndex = 2109;
 var clickID = -1;
 var clickResolve = null;
@@ -86,7 +85,7 @@ async function guiParser(jsonStr) {
           case 'image':
             objIndex++;
             setFillColor(obj);
-            $('#controlObjs').append('<img id="' + objIndex + '" src="' + obj.path + '" style="position:absolute;left:' + obj.x + 'px;top:' + obj.y + 'px;color:' + fillColor + '"></img>');
+            $('#controlObjs').append('<img onclick="clickHandler(' + objIndex + ')" id="' + objIndex + '" src="' + obj.path + '" style="position:absolute;left:' + obj.x + 'px;top:' + obj.y + 'px;height: ' + obj.h + 'px;width: ' + obj.w + 'px;"></img>');
             return objIndex;
           case 'button':
             objIndex++;
@@ -103,7 +102,7 @@ async function guiParser(jsonStr) {
             document.getElementById('' + obj.id).innerText = obj.str;
             return '';
           case 'path':
-            $('#' + obj.id).attr("src", obj.str);
+            $('#' + obj.id).attr("src", obj.path);
             return '';
           case 'position':
             $('#' + obj.id).css('left', '' + obj.x + 'px');
@@ -117,7 +116,26 @@ async function guiParser(jsonStr) {
           case 'savefile':
             return remote.dialog.showSaveDialogSync().toString();
           case 'dialog':
-            return ''+remote.dialog.showMessageBoxSync({message:obj.str,buttons:obj.option.split('|')});
+              var buts = obj.option.split('|');
+              var choosed = await new Promise(function (resolve) {
+                var buttons = []
+                for (let index = 0; index < buts.length; index++) {
+                  buttons.push({
+                    text: buts[index],
+                    onClick: function (inst) { resolve(index + 1) }
+                  })
+                }
+                buttons.push({
+                      text: '取消',
+                      onClick: function (inst) { resolve(0) }
+                    }
+                )
+                mdui.dialog({
+                  content: obj.str,
+                  buttons: buttons
+                });
+              });
+              return ''+choosed;
           case 'input':
             var str ='';
             await new Promise(function (resolve) {

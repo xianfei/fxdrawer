@@ -2,9 +2,12 @@
 const { app, BrowserWindow, TouchBar, ipcMain, dialog } = require('electron')
 const { TouchBarLabel, TouchBarButton, TouchBarSpacer } = TouchBar
 var net = require('net');
+var cp = require('child_process');
 var HOST = '127.0.0.1';
 var PORT = 6666;
+var localOnly = true;
 const versionInfo = '0.1.1';
+const Path = require("path");
 
 const isMac = process.platform === 'darwin'
 
@@ -12,31 +15,44 @@ const find = require('find-process');
 
 global.sharedObject = { prop1: process.argv }
 
-
 app.whenReady().then(fxStart)
 
 ipcMain.on('showdoc', (event, arg) => {
     showDoc()
 })
 
+// 程序入口
 function fxStart() {
-    // console.log(process)
+    //console.log(process.argv)
+    // 读取传入启动参数argv
     for (let index = 0; index < process.argv.length; index++) {
-        if (process.argv[index] === 'listen') {
+        if (process.argv[index] === 'execute') {
+            index++;
+            cp.exec(process.argv[index++], (err, stdout, stderr) => { console.log(stdout) });
+            continue;
+        } else if (process.argv[index] === 'listen') {
             index++;
             PORT = parseInt(process.argv[index++]);
             netParser();
-            return;
+            continue;
         } else if (process.argv[index] === 'showdoc') {
             showDoc();
             return;
-        } else if (process.argv[index] === 'help') {
+        } else if (process.argv[index] === 'help' || process.argv[index] === '-h' || process.argv[index] === '-help') {
             console.log('fxDrawer ' + versionInfo + '\n')
-            console.log('Usage: fxdrawer [listen <listenPort>] [showdoc] [help]\n')
+            console.log('Usage: fxdrawer [listen <listenPort>] [showdoc] [listen-ethernet]\n')
+            console.log('   listen <listenPort> : listen TCP on <listenPort>, local only by default.')
+            console.log('   showdoc : show the document.')
+            console.log('   listen-ethernet : listen TCP request on Ethernet.')
             app.quit();
             return;
+        } else if (process.argv[index] === 'listen-ethernet') {
+            localOnly = false;
+            continue;
         }
     }
+    // 打开初始化页面  用于配置path等
+    if (process.argv.length > 1) return;
     var helloWindow;
     if (isMac) helloWindow = new BrowserWindow({
         width: 700,
@@ -62,14 +78,27 @@ function fxStart() {
 }
 
 
-
+// TCP监听及数据处理
 async function netParser() {
+    await new Promise(function (resolve) {
+        find('port', PORT)
+            .then(function (list) {
+                if (list.length == 0) resolve();
+                else {
+                    if (list[0].name.indexOf('fxdrawer') != -1) { app.quit(); }
+                    else resolve();
+                }
+            });
+    });
+    console.log('now statrt')
     try {
         let tcpConnect = net.createServer(function (sock) {
-            var killpid = -1;
+            var killpid = -1; // 关闭窗口后杀死被调用进程
+            var closeOnBroke = false; // 断开连接后关闭窗口
             var mainWindow;
+            var pid;
             // 我们获得一个连接 - 该连接自动关联一个socket对象
-            console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
+            // console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
 
             // 为这个socket实例添加一个"data"事件处理函数
             sock.on('data', function (data) {
@@ -78,7 +107,11 @@ async function netParser() {
                 switch (obj.action) {
                     case 'init':
                         mainWindow = createWindow(obj.width, obj.height + 30);
-                        if (obj.hasOwnProperty('killwhenclose')) killpid = obj.killwhenclose;
+                        if (obj.hasOwnProperty('killwhenclose')) killpid = obj.pid;
+                        if (obj.hasOwnProperty('closeOnBroke')) closeOnBroke = true;
+                        if (obj.hasOwnProperty('pwd')) pwd = obj.pwd;
+
+                        // 关闭窗口后杀死被调用进程
                         mainWindow.on('close', function () { if (killpid != -1) try { process.kill(killpid); } catch (err) { } });
                         // 等待窗口加载完成
                         mainWindow.webContents.once('did-finish-load', function () { sock.write('00ok'); });
@@ -87,11 +120,15 @@ async function netParser() {
                         app.quit()
                         break;
                     default:
-                        mainWindow.webContents.send('opt-request', data.subarray(2).toString())
+                        // 发送给窗口
+                        if (obj.hasOwnProperty('path')) {
+                            obj.path = 'file://' + (process.platform === "win32" ? '/' : '') + Path.resolve(pwd, obj.path).replaceAll('\\', '/')
+                        }
+                        mainWindow.webContents.send('opt-request', JSON.stringify(obj))
                         // 等待事件结束
-                        ipcMain.once('opt-reply-'+mainWindow.id, function (event, optRet) {
-                            // console.log('opt' + optRet + '  mainid'+mainWindow.id)
-                                sock.write('00ok' + optRet);
+                        // 由窗口放回数据
+                        ipcMain.once('opt-reply-' + mainWindow.id, function (event, optRet) {
+                            sock.write('00ok' + optRet);
                         })
                 }
             });
@@ -102,7 +139,8 @@ async function netParser() {
                 // mainWindow.close()
                 try {
                     killpid = -1;
-                    mainWindow.webContents.send('connect-broke', '')
+                    if (closeOnBroke) mainWindow.close()
+                    else mainWindow.webContents.send('connect-broke', '')
                 } catch (err) {
 
                 }
@@ -113,15 +151,16 @@ async function netParser() {
                 if (err.code == 'ECONNRESET')
                     try {
                         killpid = -1;
-                        mainWindow.webContents.send('connect-broke', '')
+                        if (closeOnBroke) mainWindow.close()
+                        else mainWindow.webContents.send('connect-broke', '')
                     } catch (err) {
 
                     }
             });
 
         });
-
-        tcpConnect.listen(PORT, HOST);
+        if (localOnly) tcpConnect.listen(PORT, HOST);
+        else tcpConnect.listen(PORT);
 
         tcpConnect.on('error', function (err) {
             if (err.code == 'EADDRINUSE') {
@@ -172,10 +211,8 @@ function showDoc() {
     // and load the index.html of the app.
     docWindow.loadFile('readme.html')
 
-    // docWindow.toggleDevTools()
-
     if (!isMac) return
-
+    // 设置touchbar on macos
     docWindow.setTouchBar(new TouchBar({
         items: [
             new TouchBarButton({
@@ -217,6 +254,8 @@ function createWindow(w, h) {
     // and load the index.html of the app.
     mainWindow.loadFile('index.html')
 
+    // 设置menu菜单
+
     var template
     if (isMac) template = [
         {
@@ -249,7 +288,7 @@ function createWindow(w, h) {
     ]; else template = [
         {
             label: 'DevTools',
-            click: () => {  mainWindow.webContents.send('toggle-devtools', '') }
+            click: () => { mainWindow.webContents.send('toggle-devtools', '') }
         }, {
             label: 'ShowDoc',
             click: showDoc
@@ -331,7 +370,7 @@ function createWindow(w, h) {
         new TouchBarButton({
             label: '🛠 DevTools',
             backgroundColor: '#645922',
-            click: () => {  mainWindow.webContents.send('toggle-devtools', '') }
+            click: () => { mainWindow.webContents.send('toggle-devtools', '') }
         }),
         new TouchBarButton({
             label: '🤷🏼 Close',

@@ -12,7 +12,7 @@ const { ipcRenderer, remote } = require('electron')
 
 var sudo = require('sudo-prompt');
 
-var exec = require('child_process');
+var cp = require('child_process');
 var options = {
   name: 'Electron'
 };
@@ -101,7 +101,7 @@ window.onload = function () {
 
   }
   else {
-    exec('echo $PATH', (err, stdout, stderr) => {
+    cp.exec('echo $PATH', (err, stdout, stderr) => {
       if (err) {
         console.log(err);
         return;
@@ -129,7 +129,7 @@ function addToPath() {
       function (error, stdout, stderr) {
         if (error) {
           console.log(error);
-          exec('setx PATH "' + fxPath + ';%PATH%" && setx FXDRAWER_HOME "' + fxPath + '"', (err, stdout, stderr) => {
+          cp.exec('setx PATH "' + fxPath + ';%PATH%" && setx FXDRAWER_HOME "' + fxPath + '"', (err, stdout, stderr) => {
             if (err) {
               console.log(err);
               return;
