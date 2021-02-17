@@ -14,6 +14,7 @@ int main() {
 	objID inputLineWidth = putInputBox(500, 80, 80, 20, "range\" min='0' max='10' value='1.5' step=\"0.5");
 	setColorW(fxColorLightPink);
 	char str[20];
+	showInputDialog("123", str);
 	while (1) {
 		waitForAny(str);
 		if(sscanf_s(str,"xy:%d,%d",&x,&y))
