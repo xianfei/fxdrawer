@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>fxDrawer</title>
+    <!-- This is a welcome page for fxD -->
+    <link rel="stylesheet" href="./mdui-v1/css/mdui.css">
+    <style type="text/css">
+    ::-webkit-scrollbar {
+    display: none;
+}
+      </style>
+</head>
+
+<body class="mdui-theme-primary-blue mdui-theme-accent-blue">
+    <div id='titlebar'
+        style="text-align:center;position: fixed;right: 0px;top: 0px;width: 100%;height: 28px;-webkit-app-region: drag;z-index: 10;background: #eeeeee;">
+        <span style="line-height:28px;font-family: 'Roboto';font-size: 12px;">fxDrawer</span><span id="connectbroke" style="line-height:28px;font-family: 'Roboto';font-size: 12px;color: #F00;"></span>
+    </div>
+    <div id='btns' style="-webkit-app-region: nodrag;"></div>
+    <div style="inset: 28px 0px 0px; position: absolute; overflow: auto;">
+        <div id='welcome' style="padding-left: 40px;padding-top: 20px;">
+          <h1>欢迎使用fxDrawer</h1>
+          为了您能正常使用fxDrawer，您需要将fxDrawer目录添加到PATH环境变量中。<br><br>
+          当前目录:<span id="dir"></span><span id="result"></span><br><br><button id="addtopathBtn">添加到Path</button>&nbsp;<span id="stdout"></span>
+          <br><br>您可以点击标题栏中的 <i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i> 图标查看用户手册及使用方法。
+        </div>
+        
+    </div>
+  
+        <script src='./mdui-v1/js/mdui.js'></script>
+        <script src='./welcome.js'></script>
+
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>fxDrawer</title>
+  <!-- This is tech preview version of fxDrawer with HTML5 -->
+  <link rel="stylesheet" href="./mdui-v1/css/mdui.css">
+  <script src="jquery.js"></script>
+  <script src="./jquery-ui/jquery-ui.js"></script>
+  <link rel="stylesheet" href="./mdui-v1/css/mdui.css" />
+  <style type="text/css">
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    #fxdwindow {
+      width: 300px;
+      height: 200px;
+      top: 100px;
+      left: 100px;
+    }
+
+    #titlebar {
+      cursor: move;
+    }
+  </style>
+  <script>
+    $(function () {
+      $("#fxdwindow").draggable({ handle: "#titlebar" });
+      $("#titlebar").disableSelection();
+    });
+  </script>
+</head>
+
+<body class="mdui-theme-primary-blue mdui-theme-accent-blue" style="background-color: #555;">
+  <div id='fxdwindow' class="mdui-card mdui-shadow-20">
+    <div id='titlebar'
+      style="text-align:center;right: 0px;top: 0px;width: 100%;height: 28px;-webkit-app-region: drag;z-index: 10;background: #eeeeee;">
+      <span style="line-height:28px;font-family: 'Roboto';font-size: 12px;">fxDrawer</span>
+      <span id="connectbroke" style="line-height:28px;font-family: 'Roboto';font-size: 12px;color: #F00;"> 正在加载中</span>
+        <button class="mdui-btn mdui-btn-icon"
+          style="height:28px;width:28px;min-width:28px;line-height:28px;position: absolute;right: 5px;top: 0px;-webkit-app-region: no-drag;z-index: 11;"
+          id="closebtn" onclick="$('#fxdwindow').remove();" title="close"><i class="mdui-icon material-icons"
+            style="font-size: 20px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">close</i></button>
+    </div>
+    <div id="mainarea" style="inset: 28px 0px 0px; position: absolute; overflow: auto;">
+      <div id="drawThings" style="position:absolute;left:0;top:0px"></div>
+      <div id="controlObjs" style="position:absolute;left:0;top:0px;"></div>
+
+    </div>
+    <script src='./mdui-v1/js/mdui.js'></script>
+    <script src='./fxdweb-renderer.js'></script>
+  </div>
+</body>
+
+</html>

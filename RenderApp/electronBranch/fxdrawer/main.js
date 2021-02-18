@@ -3,8 +3,11 @@ const { app, BrowserWindow, TouchBar, ipcMain, dialog } = require('electron')
 const { TouchBarLabel, TouchBarButton, TouchBarSpacer } = TouchBar
 var net = require('net');
 var cp = require('child_process');
+// fxDrawer与适配器交互监听
 var HOST = '127.0.0.1';
 var PORT = 6666;
+
+// 是否监听局域网（true=>绑定127.0.0.1 false=>绑定0.0.0.0）
 var localOnly = true;
 const versionInfo = '0.1.1';
 const Path = require("path");
@@ -13,6 +16,7 @@ const isMac = process.platform === 'darwin'
 
 const find = require('find-process');
 
+// 用于共享argv参数变量
 global.sharedObject = { prop1: process.argv }
 
 app.whenReady().then(fxStart)
@@ -38,11 +42,15 @@ function fxStart() {
         } else if (process.argv[index] === 'showdoc') {
             showDoc();
             return;
+        } else if (process.argv[index] === 'server') {
+            showServ();
+            return;
         } else if (process.argv[index] === 'help' || process.argv[index] === '-h' || process.argv[index] === '-help') {
             console.log('fxDrawer ' + versionInfo + '\n')
             console.log('Usage: fxdrawer [listen <listenPort>] [showdoc] [listen-ethernet]\n')
             console.log('   listen <listenPort> : listen TCP on <listenPort>, local only by default.')
             console.log('   showdoc : show the document.')
+            console.log('   server : show fxDrawer web server controller.')
             console.log('   listen-ethernet : listen TCP request on Ethernet.')
             app.quit();
             return;
@@ -61,6 +69,7 @@ function fxStart() {
         webPreferences: {
             enableRemoteModule: true,
             nodeIntegration: true,
+            contextIsolation: false,
         }
     });
     else
@@ -71,9 +80,10 @@ function fxStart() {
             webPreferences: {
                 enableRemoteModule: true,
                 nodeIntegration: true,
+                contextIsolation: false,
             }
         })
-    helloWindow.loadFile('start.html')
+    helloWindow.loadFile('welcome.html')
     // helloWindow.toggleDevTools();
 }
 
@@ -96,7 +106,7 @@ async function netParser() {
             var killpid = -1; // 关闭窗口后杀死被调用进程
             var closeOnBroke = false; // 断开连接后关闭窗口
             var mainWindow;
-            var pid;
+            var pwd='';
             // 我们获得一个连接 - 该连接自动关联一个socket对象
             // console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
 
@@ -122,7 +132,8 @@ async function netParser() {
                     default:
                         // 发送给窗口
                         if (obj.hasOwnProperty('path')) {
-                            obj.path = 'file://' + (process.platform === "win32" ? '/' : '') + Path.resolve(pwd, obj.path).replaceAll('\\', '/')
+                            var p = Path.resolve(pwd, obj.path).replaceAll('\\', '/')
+                            obj.path = 'file://' + (process.platform === "win32" ? '/' : '') + p
                         }
                         mainWindow.webContents.send('opt-request', JSON.stringify(obj))
                         // 等待事件结束
@@ -186,6 +197,49 @@ async function netParser() {
 
 }
 
+function showServ() {
+    var servWindow;
+    if (isMac) servWindow = new BrowserWindow({
+        width: 900,
+        height: 600,
+        titleBarStyle: 'hidden',
+        webPreferences: {
+            enableRemoteModule: true,
+            nodeIntegration: true,
+            contextIsolation: false,
+        }
+    });
+    else
+        servWindow = new BrowserWindow({
+            width: 900,
+            height: 600,
+            frame: false,
+            webPreferences: {
+                enableRemoteModule: true,
+                nodeIntegration: true,
+                contextIsolation: false,
+            }
+        })
+
+    // and load the html of the app.
+    servWindow.loadFile('fxdserv.html')
+
+    if (!isMac) return
+    // 设置touchbar on macos
+    servWindow.setTouchBar(new TouchBar({
+        items: [
+            // new TouchBarButton({
+            //     label: '👌 Got it and Close',
+            //     backgroundColor: '#22644d',
+            //     click: () => {
+            //         servWindow.close();
+            //     }
+            // }),
+            new TouchBarLabel({ label: "fxDrawer Web Server Beta by xianfei" })
+        ]
+    }))
+}
+
 function showDoc() {
     var docWindow;
     if (isMac) docWindow = new BrowserWindow({
@@ -195,6 +249,7 @@ function showDoc() {
         webPreferences: {
             enableRemoteModule: true,
             nodeIntegration: true,
+            contextIsolation: false,
         }
     });
     else
@@ -205,10 +260,11 @@ function showDoc() {
             webPreferences: {
                 enableRemoteModule: true,
                 nodeIntegration: true,
+                contextIsolation: false,
             }
         })
 
-    // and load the index.html of the app.
+    // and load the html of the app.
     docWindow.loadFile('readme.html')
 
     if (!isMac) return
@@ -251,8 +307,8 @@ function createWindow(w, h) {
         }
     })
 
-    // and load the index.html of the app.
-    mainWindow.loadFile('index.html')
+    // and load the html of the app.
+    mainWindow.loadFile('fxdapp.html')
 
     // 设置menu菜单
 

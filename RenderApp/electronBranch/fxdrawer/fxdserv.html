@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>fxDrawer</title>
+    <!-- This is a welcome page for fxD -->
+    <link rel="stylesheet" href="./mdui-v1/css/mdui.css">
+    <style type="text/css">
+        .fullwidth {
+            width: 100%;
+        }
+
+        .miniwidth {
+            width: 50px;
+        }
+
+        .container {
+            margin: 10px;
+        }
+
+        .card {
+            height: 40px;
+            width: 100%;
+            line-height: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body class="mdui-theme-primary-blue mdui-theme-accent-blue">
+    <div id='titlebar'
+        style="text-align:center;position: fixed;right: 0px;top: 0px;width: 100%;height: 28px;-webkit-app-region: drag;z-index: 10;background: #eeeeee;">
+        <span style="line-height:28px;font-family: 'Roboto';font-size: 12px;">fxDrawer Web Server</span><span
+            id="connectbroke"
+            style="line-height:28px;font-family: 'Roboto';font-size: 12px;color: rgb(253, 168, 10);padding-left: 10px;">服务已暂停</span>
+    </div>
+    <div id='btns' style="-webkit-app-region: nodrag;"></div>
+    <div style="inset: 28px 0px 0px; position: absolute; overflow: auto;">
+        <div id='servcontain' style="padding-left: 20px;padding-top: 10px;">
+            <div id='left' style="width: 45%;position: absolute;height: 55%;overflow:auto;">
+                <div id='control' class="container" style="line-height: 30px;">
+                    <div>程序路径：(必须为可执行程序)&nbsp;&nbsp;<a href="javascript:void(0);" onclick="chooseExec()">浏览</a><input id='execpath' type="text"
+                            class="fullwidth"></div>
+                    <div>运行参数：(使用json字符串数组形式)<input id='args' type="text" class="fullwidth" value='[""]'></div>
+                    <div>相对路径解析目录：&nbsp;&nbsp;<a href="javascript:void(0);" onclick="choosePath()">浏览</a><input id='path' type="text" class="fullwidth">
+                    </div>
+                    <div style="margin-top: 10px;">HTTP端口：<input id='httpport' type="text" class="miniwidth" value='80'>
+                        &nbsp;&nbsp;&nbsp;&nbsp;fxdPort：<input id='fxdport' type="text" class="miniwidth" value='6666'>
+                    </div>
+                    <button style="margin-top: 10px;width: 40%;height: 30px;"  onclick="startServ(this)">启动服务</button>
+                    &nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="document.getElementById('log').innerHTML=''">清空日志</a>
+                </div>
+            </div>
+            <div id='right' style="top:5%;width: 45%;left:50%;position: absolute;height: 50%;overflow:auto;">
+                <div id='clientlist' class="container">
+                </div>
+            </div>
+            <div id='bottom' style="width:95%;position: absolute;top:58%;height: 38%;overflow:auto;border: solid;">
+                <div id='log' style="padding: 10px;line-height: 18px;">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src='./mdui-v1/js/mdui.js'></script>
+    <script src='./fxdserv.js'></script>
+
+</body>
+
+</html>

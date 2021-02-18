@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>fxDrawer</title>
+  <!-- This is tech preview version of fxDrawer with HTML5 -->
+  <link rel="stylesheet" href="./mdui-v1/css/mdui.css">
+  <style type="text/css">
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .box {
+      width: 0px;
+      height: 0px;
+      position: absolute;
+      opacity: 0.5;
+      cursor: move;
+    }
+
+    .droptarget {
+      float: left;
+      width: 100px;
+      height: 1000px;
+      margin: 15px;
+      padding: 10px;
+      border: 1px solid #aaaaaa;
+    }
+
+    .coordiv {
+      position: absolute;
+      z-index: 9;
+      top: 28px;
+      right: 0;
+      width: 100%;
+      background:
+        -webkit-linear-gradient(top, transparent 49px, rgba(0, 174, 255, 0.5) 50px),
+        -webkit-linear-gradient(left, transparent 49px, rgba(0, 174, 255, 0.5) 50px);
+      background-size: 50px 50px;
+    }
+  </style>
+</head>
+
+<body class="mdui-theme-primary-blue mdui-theme-accent-blue">
+  <div id='titlebar'
+    style="text-align:center;position: fixed;right: 0px;top: 0px;width: 100%;height: 28px;-webkit-app-region: drag;z-index: 10;background: #eeeeee;">
+    <span style="line-height:28px;font-family: 'Roboto';font-size: 12px;">fxDrawer</span>
+    <span id="connectbroke" style="line-height:28px;font-family: 'Roboto';font-size: 12px;color: #F00;"></span>
+  </div>
+  <div id='btns' style="-webkit-app-region: nodrag;"></div>
+  <div style="inset: 28px 0px 0px; position: absolute; overflow: auto;">
+    <div id="drawThings" style="position:absolute;left:0;top:0px"></div>
+    <div id="controlObjs" style="position:absolute;left:0;top:0px;"></div>
+
+  </div>
+  <div id="designer" style="inset: 0px 0px 0px; position: absolute; overflow: auto;">
+
+    <script>//框内移动显示坐标
+      function cnvs_getCoordinates(e) {
+        x = e.pageX - e.target.offsetLeft;//不能用clientX,pageX为文档坐标,clientX表示浏览器界面坐标,会随滚动条改变
+        y = e.pageY - e.target.offsetTop;
+        document.getElementById("xycoordinates").innerHTML = "<font>Coordinates: (" + (x) + "," + (y) + ")</font>";
+      }
+      function cnvs_clearCoordinates()//出框后不显示坐标
+      {
+        document.getElementById("xycoordinates").innerHTML = "<font>Coordinates:</font>";
+      }
+    </script>
+    <div id="coordiv" class="coordiv" onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()">
+    </div>
+    <br>
+    <div id='infoBar' style="position: fixed;left: 5px;bottom: 20px;width: 100%;height: 28px;z-index: 10;">
+      <div id="xycoordinates"></div>
+      <span>x,y,w,h: </span>
+    </div>
+
+  </div>
+  <script src='./mdui-v1/js/mdui.js'></script>
+  <script src='./fxdapp-renderer.js'></script>
+
+</body>
+
+</html>
