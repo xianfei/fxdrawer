@@ -10,6 +10,8 @@ var clickXyResolve = null;
 var fillColor = 'rgba(0,255,0,0.3)';
 var strokeColor = 'rgba(0,255,0,0.3)';
 var strokeWidth = 0.0
+var window_height = 0;
+var window_width = 0;
 
 function setFillColor(obj) {
   if (obj.hasOwnProperty('color')) {
@@ -40,17 +42,19 @@ async function guiParser(jsonStr) {
     // console.log(jsonStr.toString())
     const obj = JSON.parse(jsonStr.toString());
     switch (obj.action) {
-      case 'init':{
-        $('#fxdwindow').css('height',''+(obj.height+30)+'px')
-        $('#fxdwindow').css('width',''+obj.width+'px')
-        $('#controlObjs').attr('style', 'height:' +(parseInt(window.getComputedStyle(document.getElementById('mainarea')).getPropertyValue('height'))-10)+'px;width=' + (parseInt(window.getComputedStyle(document.getElementById('mainarea')).getPropertyValue('width'))-10)+'px;')
+      case 'init': {
+        window_height = obj.height;
+        window_width = obj.width;
+        $('#fxdwindow').css('height', '' + (obj.height + 30) + 'px')
+        $('#fxdwindow').css('width', '' + obj.width + 'px')
+        $('#controlObjs').attr('style', 'height:' + (window_height - 10) + 'px;width=' + (window_width - 10)+ 'px;')
         $("#drawThings").append(
-            '<canvas id="fxpoints" width="' + (parseInt(window.getComputedStyle(document.getElementById('mainarea')).getPropertyValue('width'))-10)+'px" height="' +(parseInt(window.getComputedStyle(document.getElementById('mainarea')).getPropertyValue('height'))-10)+'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
-          document.getElementById('connectbroke').innerText = ' '
+          '<canvas id="fxpoints" width="' + (window_width - 10) + 'px" height="' + (window_height - 10) + 'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
+        document.getElementById('connectbroke').innerText = ' '
 
         break;
       }
-      case 'exit':{
+      case 'exit': {
         document.getElementById('connectbroke').innerText = ' 服务器端关闭了这个程序'
         break;
       }
@@ -88,7 +92,7 @@ async function guiParser(jsonStr) {
           case 'label':
             objIndex++;
             setFillColor(obj);
-            $('#controlObjs').append('<span id="' + objIndex + '" style="font-size: ' + obj.size + 'px;white-space: pre-line;position:absolute;left:' + obj.x + 'px;top:' + obj.y + 'px;color:' + fillColor + '">' + obj.str + '</span>');
+            $('#controlObjs').append('<span id="' + objIndex + '" style="font-size: ' + obj.size + 'px;width:max-content;white-space: pre-line;position:absolute;left:' + obj.x + 'px;top:' + obj.y + 'px;color:' + fillColor + '">' + obj.str + '</span>');
             return objIndex;
           case 'image':
             objIndex++;
@@ -134,24 +138,24 @@ async function guiParser(jsonStr) {
                 })
               }
               buttons.push({
-                    text: '取消',
-                    onClick: function (inst) { resolve(0) }
-                  }
+                text: '取消',
+                onClick: function (inst) { resolve(0) }
+              }
               )
               mdui.dialog({
                 content: obj.str,
                 buttons: buttons
               });
-              $( ".mdui-dialog" ).draggable()
+              $(".mdui-dialog").draggable()
               var e = $('.mdui-overlay')[0];
               var eClone = e.cloneNode(true);
               e.parentNode.replaceChild(eClone, e);
             });
-            return ''+choosed;
+            return '' + choosed;
           case 'input':
-            var str ='';
+            var str = '';
             await new Promise(function (resolve) {
-              mdui.prompt(obj.hint,function (value) { str=value; resolve();}, function (value) { resolve();} ,{ type: 'textarea' });
+              mdui.prompt(obj.hint, function (value) { str = value; resolve(); }, function (value) { resolve(); }, { type: 'textarea' });
             });
             return str;
         }break;
@@ -171,16 +175,17 @@ async function guiParser(jsonStr) {
                 clickXyResolve = function () { clickXyResolve = null; resolve(); };
               });
             }
-            return '(' + (clickX-parseInt($('#fxdwindow').css('left'))) + ',' + (clickY-28-parseInt($('#fxdwindow').css('top'))) + ')';
+            return '(' + (clickX - parseInt($('#fxdwindow').css('left'))) + ',' + (clickY - 28 - parseInt($('#fxdwindow').css('top'))) + ')';
           case 'wait-any': // 返回id或xy值或键盘按键
             var isButton = false;
             if (!isClickedXy) {
-            await new Promise(function (resolve) {
-              clickResolve = function(){isButton=true;resolve();}
-              clickXyResolve = resolve;
-            });}
-            if(isButton)return 'id:'+clickID;
-            else return 'xy:' + (clickX-parseInt($('#fxdwindow').css('left'))) +',' + (clickY-28-parseInt($('#fxdwindow').css('top')));
+              await new Promise(function (resolve) {
+                clickResolve = function () { isButton = true; resolve(); }
+                clickXyResolve = resolve;
+              });
+            }
+            if (isButton) return 'id:' + clickID;
+            else return 'xy:' + (clickX - parseInt($('#fxdwindow').css('left'))) + ',' + (clickY - 28 - parseInt($('#fxdwindow').css('top')));
           case 'str':
             if ($('#' + obj.id).attr("value") !== "undefined")
               return $('#' + obj.id).val().toString();
@@ -199,7 +204,7 @@ async function guiParser(jsonStr) {
             });
             $("#drawThings").append(
               '<canvas id="fxpoints" width="' + width_ + '" height="' + height_ + '" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
-                break;
+            break;
         }break;
       case 'execute':
         var ret = eval(obj.code)
@@ -222,24 +227,24 @@ window.onload = function (e) {
   //   document.getElementById('connectbroke').innerText = ' 连接已断开'
   // })
 
-  var ws = new WebSocket("ws://"+document.location.host+"/ws");
-    ws.onopen = function (e) {
-        console.log('Connection to server opened');
-    }
+  var ws = new WebSocket("ws://" + document.location.host + "/ws");
+  ws.onopen = function (e) {
+    console.log('Connection to server opened');
+  }
 
-    ws.onmessage = async function (e) {
-        console.log(e.data);
-        const ret = await guiParser(e.data);
-        ws.send(ret);
-    };
+  ws.onmessage = async function (e) {
+    console.log(e.data);
+    const ret = await guiParser(e.data);
+    ws.send(ret);
+  };
 
-    ws.onclose = function (){
-      document.getElementById('connectbroke').innerText = ' 连接已断开'
-    }
+  ws.onclose = function () {
+    document.getElementById('connectbroke').innerText = ' 连接已断开'
+  }
 
-    ws.onerror = function (){
-      document.getElementById('connectbroke').innerText = ' 连接失败'
-    }
+  ws.onerror = function () {
+    document.getElementById('connectbroke').innerText = ' 连接失败'
+  }
 
 }
 
@@ -247,7 +252,7 @@ window.onload = function (e) {
 
 function drawXYArray(xArray, yArray) {
   $("#drawThings").append(
-    '<canvas id="' + objIndex + '" width="' + (parseInt(window.getComputedStyle(document.getElementById('mainarea')).getPropertyValue('width'))-10)+'px" height="' +(parseInt(window.getComputedStyle(document.getElementById('mainarea')).getPropertyValue('height'))-10)+'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
+    '<canvas id="' + objIndex + '" width="' + (window_width - 10) + 'px" height="' + (window_height - 10) + 'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
   let canvas = document.getElementById('' + objIndex);
   var ctx = canvas.getContext('2d');
   ctx.fillStyle = fillColor;
@@ -265,7 +270,7 @@ function drawXYArray(xArray, yArray) {
 
 function drawCircle(x, y, r) {
   $("#drawThings").append(
-    '<canvas id="' + objIndex + '" width="' + (parseInt(window.getComputedStyle(document.getElementById('mainarea')).getPropertyValue('width'))-10)+'px" height="' +(parseInt(window.getComputedStyle(document.getElementById('mainarea')).getPropertyValue('height'))-10)+'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
+    '<canvas id="' + objIndex + '" width="' + (window_width - 10) + 'px" height="' + (window_height - 10) + 'px" style="position:absolute;left:0;top:0;background:rgba(255,255,255,0);"></canvas>');
   let canvas = document.getElementById('' + objIndex);
   var ctx = canvas.getContext('2d');
   ctx.fillStyle = fillColor;
@@ -278,27 +283,27 @@ function drawCircle(x, y, r) {
   ctx.stroke();
 }
 
-var lastx=-1000,lasty=-1000;
+var lastx = -1000, lasty = -1000;
 var lastmill = 0
 function drawPoint(x, y, r, smooth) {
   let canvas = document.getElementById('fxpoints');
   var ctx = canvas.getContext('2d');
   ctx.fillStyle = fillColor;
   ctx.beginPath();
-  var millnow=new Date().getTime();
-  if(((x-lastx)*(x-lastx)+(y-lasty)*(y-lasty))<smooth*smooth&&millnow-lastmill<100){
+  var millnow = new Date().getTime();
+  if (((x - lastx) * (x - lastx) + (y - lasty) * (y - lasty)) < smooth * smooth && millnow - lastmill < 100) {
     ctx.strokeStyle = fillColor;
-    ctx.lineWidth = 2*r;
+    ctx.lineWidth = 2 * r;
     ctx.moveTo(lastx, lasty);
     ctx.lineTo(x, y);
     ctx.closePath();
     ctx.stroke();
-  }else{
+  } else {
     ctx.arc(x, y, r, 0, 2 * Math.PI);
     ctx.closePath();
   }
-  lastx=x;
-  lasty=y;
+  lastx = x;
+  lasty = y;
   lastmill = millnow;
   ctx.fill();
 }
@@ -332,12 +337,12 @@ function draginit(e) {
 };
 
 function randomBG() {
-  $('body').css('height',''+window.innerHeight+'px')
-  window.onresize = function(){$('body').css('height',''+window.innerHeight+'px')}
+  $('body').css('height', '' + window.innerHeight + 'px')
+  window.onresize = function () { $('body').css('height', '' + window.innerHeight + 'px') }
   var index = Math.floor(Math.random() * Math.floor(8))
-  $('body').css('background-image','url(https://bing.biturl.top/?resolution=1920&format=image&index='+index+'&mkt=zh-CN)');
-  $('body').css('background-position','center center')
-  $('body').css('background-size','cover')
-  $('body').css(' background-attachment','fixed')
-  $('body').css('background-repeat','no-repeat')
+  $('body').css('background-image', 'url(https://bing.biturl.top/?resolution=1920&format=image&index=' + index + '&mkt=zh-CN)');
+  $('body').css('background-position', 'center center')
+  $('body').css('background-size', 'cover')
+  $('body').css(' background-attachment', 'fixed')
+  $('body').css('background-repeat', 'no-repeat')
 }

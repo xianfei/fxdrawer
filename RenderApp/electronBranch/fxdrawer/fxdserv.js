@@ -84,7 +84,7 @@ wss.on('connection', function (ws, req) {
     //console.log(data.toString()); 
   });
   var pid = childProcess.pid
-  var ip = req.socket.remoteAddress
+  var ip = req.socket.remoteAddress.replaceAll('::ffff:','')
   loginfo('新客户端：' + ip + ' pid:' + pid)
   $('#clientlist').append(`<div id="pid${pid}" class="card mdui-shadow-3">&nbsp;&nbsp;ip:${ip}&nbsp;&nbsp;pid:${pid}</div>`)
   // 推入到pid-ws对应表
