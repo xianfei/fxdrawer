@@ -59,6 +59,7 @@ var sockets = net.createServer(async function (sock) {
     pidSocketMap.set(parseInt(pid), null)
     ws.send('{"action": "exit"}');
     try {
+      $('#pid'+pid).remove();
       process.kill(pid);
     } catch (e) {
     }
@@ -73,9 +74,13 @@ var sockets = net.createServer(async function (sock) {
 wss.on('connection', function (ws, req) {
   // 创建新的本地应用并获取pid
 
-  var childProcess = cp.execFile(executePath.replaceAll('\\', '/'));
+  var childProcess = cp.execFile(executePath.replaceAll('\\', '/'),executeArgs);
   childProcess.stdout.on('data', function (data) {
     logstdout(childProcess.pid, data.toString())
+    //console.log(data.toString()); 
+  });
+  childProcess.stderr.on('data', function (data) {
+    logstderr(childProcess.pid, data.toString())
     //console.log(data.toString()); 
   });
   var pid = childProcess.pid
@@ -94,10 +99,10 @@ wss.on('connection', function (ws, req) {
 
   ws.on('close', function () {
     loginfo('ws close, client:' + req.socket.remoteAddress);
-    $('#pid'+pid).remove();
     pidWsMap.set(parseInt(pid), null)
     pidSocketMap.set(parseInt(pid), null)
     try {
+      $('#pid'+pid).remove();
       process.kill(pid);
     } catch (e) {
     }
@@ -218,6 +223,12 @@ function logstdout(pid, info) {
   ele.scrollTop = ele.scrollHeight;
 }
 
+function logstderr(pid, info) {
+  $('#log').append('<span style="color:#f00">[ STDERR PID:' + pid + ']&nbsp;&nbsp;' + info.replaceAll('\n', '<br>') + '</span><br>')
+  var ele = document.getElementById('bottom');
+  ele.scrollTop = ele.scrollHeight;
+}
+
 function logerror(info) {
   $('#log').append('<span style="color:#f00">[ ERROR ]&nbsp;&nbsp;' + info + '</span><br>')
   var ele = document.getElementById('bottom');
@@ -241,6 +252,7 @@ function startServ(btn) {
     httpPort = parseInt($('#httpport').val());
     fxPort = parseInt($('#fxdport').val());
     try {
+      executeArgs = JSON.parse($('#args').val());
       server.listen(httpPort);
       sockets.listen(fxPort);
     } catch (err) {
