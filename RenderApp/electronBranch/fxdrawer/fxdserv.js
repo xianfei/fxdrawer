@@ -121,6 +121,7 @@ var server = http.createServer(function (req, res) {
         html: 'text/html;charset=utf-8',
         png: "image/png",
         jpg: "image/jpeg",
+        ico: "image/x-icon",
         jpeg: "image/jpeg",
         gif: "image/gif",
         css: "text/css;charset=utf-8",
@@ -230,9 +231,10 @@ function chooseExec() {
 function choosePath() {
   $('#path').val(remote.dialog.showOpenDialogSync({ properties: ['openDirectory'] }).toString());
 }
+var os = require('os');
+var ifaces = os.networkInterfaces();
 
 function startServ(btn) {
-  loginfo($(btn).text());
   if ($(btn).text() == "启动服务") {
     executePath = $('#execpath').val();
     pwd = $('#path').val();
@@ -245,7 +247,26 @@ function startServ(btn) {
       logerror(err.toString());
       return
     }
-    loginfo('服务已启动');
+    loginfo('服务已启动，本机IP信息如下：');
+    Object.keys(ifaces).forEach(function (ifname) {
+      var alias = 0;
+    
+      ifaces[ifname].forEach(function (iface) {
+        if ('IPv4' !== iface.family || iface.internal !== false) {
+          // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+          return;
+        }
+    
+        if (alias >= 1) {
+          // this single interface has multiple ipv4 addresses
+          loginfo(ifname + ':' + alias + '&nbsp;&nbsp;&nbsp;'+ iface.address);
+        } else {
+          // this interface has only one ipv4 adress
+          loginfo(ifname + '&nbsp;&nbsp;&nbsp;' + iface.address);
+        }
+        ++alias;
+      });
+    });
     $('#connectbroke').text('服务已启动')
     $('#connectbroke').css('color', 'rgb(50, 216, 0)')
     $(btn).text('暂停服务')

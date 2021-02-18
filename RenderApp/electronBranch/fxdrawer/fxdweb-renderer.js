@@ -143,6 +143,9 @@ async function guiParser(jsonStr) {
                 buttons: buttons
               });
               $( ".mdui-dialog" ).draggable()
+              var e = $('.mdui-overlay')[0];
+              var eClone = e.cloneNode(true);
+              e.parentNode.replaceChild(eClone, e);
             });
             return ''+choosed;
           case 'input':
