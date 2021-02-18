@@ -3,6 +3,7 @@ import json
 import sys
 import socket
 import time
+import re
 
 jarLoc = './untitled.jar'
 fxHost = '127.0.0.1'
@@ -17,7 +18,8 @@ def initDrawer(w, h):
     # os.popen(
     #     '/usr/libexec/java_home -v 1.8 -exec java -jar ' + jarLoc + ' -verbose true -port ' + str(
     #         fxPort) + ' -kill ' + str(os.getpid()))
-    os.popen("bash -c 'cd /Users/xianfei/WebstormProjects/untitled && /usr/local/bin/electron .'")
+    os.popen('fxdrawer listen '+ str(fxPort))
+    print(os.getpid())
     srv_addr = (fxHost, fxPort)
     while True:
         time.sleep(1)
@@ -29,7 +31,7 @@ def initDrawer(w, h):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if verboseMode:
                 print(e)
-    sendData = {'action': "init", "width": w, "height": h}
+    sendData = {'action': "init", "width": w, "height": h, "killwhenclose": 1, "pid": os.getpid()}
     ret = sendDict(sendData)
     if verboseMode:
         print(ret)
@@ -61,15 +63,15 @@ def setColor(r, g, b, a):
     c.r = r
     c.g = g
     c.b = b
-    c.a = a+0.0  # force it double
+    c.a = a + 0.0  # force it double
 
 
 def setStroke(r, g, b, a, width):
     stroke.r = r
     stroke.g = g
     stroke.b = b
-    stroke.a = a+0.0  # force it double
-    stroke.w = width+0.0  # force it double
+    stroke.a = a + 0.0  # force it double
+    stroke.w = width + 0.0  # force it double
 
 
 def set_default(obj):
@@ -93,17 +95,25 @@ def sendDict(sendData):
 def drawCircle(x, y, r):
     sendData = {'action': "draw", "shape": "circle", "x": x, "y": y, "r": r, "color-r": c.r, "color-g": c.g,
                 "color-b": c.b, "color-a": c.a, "stroke-r": stroke.r, "stroke-g": stroke.g,
-                "stroke-b": stroke.b, "stroke-a": stroke.a,"stroke-w": stroke.w}
+                "stroke-b": stroke.b, "stroke-a": stroke.a, "stroke-w": stroke.w}
     ret = sendDict(sendData)
     if verboseMode:
         print(ret)
     return int(ret[2:])
 
 
+def drawPoint(x, y, r):
+    sendData = {'action': "draw", "shape": "point", "x": x, "y": y, "r": r, "color-r": c.r, "color-g": c.g,
+                "color-b": c.b, "color-a": c.a}
+    ret = sendDict(sendData)
+    if verboseMode:
+        print(ret)
+
+
 def drawRectangle(x, y, w, h):
     sendData = {'action': "draw", "shape": "rectangle", "x": x, "y": y, "w": w, 'h': h, "color-r": c.r, "color-g": c.g,
                 "color-b": c.b, "color-a": c.a, "stroke-r": stroke.r, "stroke-g": stroke.g,
-                "stroke-b": stroke.b, "stroke-a": stroke.a,"stroke-w": stroke.w}
+                "stroke-b": stroke.b, "stroke-a": stroke.a, "stroke-w": stroke.w}
     ret = sendDict(sendData)
     if verboseMode:
         print(ret)
@@ -114,7 +124,7 @@ def drawPolygon(numberOfPoints, xArray, yArray):
     sendData = {'action': "draw", "shape": "polygon", "x-array": xArray, "y-array": yArray, "points": numberOfPoints,
                 "color-r": c.r, "color-g": c.g,
                 "color-b": c.b, "color-a": c.a, "stroke-r": stroke.r, "stroke-g": stroke.g,
-                "stroke-b": stroke.b, "stroke-a": stroke.a,"stroke-w": stroke.w}
+                "stroke-b": stroke.b, "stroke-a": stroke.a, "stroke-w": stroke.w}
     ret = sendDict(sendData)
     if verboseMode:
         print(ret)
@@ -147,8 +157,8 @@ def putImage(x, y, w, h, pathString):
     return int(ret[2:])
 
 
-def putInputBox(x, y, w, h):
-    sendData = {'action': "add", "object": "input", "x": x, "y": y, "w": w, 'h': h}
+def putInputBox(x, y, w, h, type):
+    sendData = {'action': "add", "object": "input", "x": x, "y": y, "w": w, 'h': h, 'type': type}
     ret = sendDict(sendData)
     if verboseMode:
         print(ret)
@@ -200,6 +210,14 @@ def getText(id):
     return ret[2:]
 
 
+def executeJs(code):
+    sendData = {'action': "execute", "code": code}
+    ret = sendDict(sendData)
+    if verboseMode:
+        print(ret)
+    return ret[2:]
+
+
 def removeByID(id):
     sendData = {'action': "delete", "id": id}
     ret = sendDict(sendData)
@@ -213,6 +231,14 @@ def waitForClick():
     if verboseMode:
         print(ret)
     return int(ret[2:])
+
+
+def waitForClickXy():
+    sendData = {'action': "get", "object": "wait-click-xy"}
+    ret = sendDict(sendData)
+    if verboseMode:
+        print(ret)
+    return re.findall(r"\d+\.?\d*", ret)
 
 
 def closeDrawer():
