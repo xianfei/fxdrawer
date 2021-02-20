@@ -1,6 +1,6 @@
 /*markdown_box*/
-html{background: #F4F6F9; font-family:"Microsoft YaHei", "微软雅黑", Arial; font-weight: 400}
-body{background:#F4F6F9;font-size: 16px; color: #515254; line-height: 188%; margin: 0 !important; padding: 0 !important;}
+html{background: #F4F6F900; font-family:"Microsoft YaHei", "微软雅黑", Arial; font-weight: 400}
+body{background:#7aaefc00;font-size: 16px; color: #515254; line-height: 188%; margin: 0 !important; padding: 0 !important;}
 .html_header{display:block; height: 60px; line-height: 46px; border-bottom: 1px solid #E6ECF1; text-align: left !important;}
 .html_header span::after{content: "使用文档"; font-size: 17px; font-weight: bold;}
 .html_header span::before{content: "❖"; font-size: 19px; font-weight: bold; margin:0 8px 0 5px; color: #1284d9}
@@ -50,49 +50,14 @@ img{border-radius:5px;margin:30px 0 46px !important;width:100%;max-width: 1100px
 }
 
 
-/*scroll_style*/
-.AnchorContent {
-overflow-y: auto !important;
-overflow-x: hidden !important;
-margin-right:0 !important
-}
-
 .AnchorContent::-webkit-scrollbar {
-width: 6px;
-height: 10px;
-background-color: rgba(0,0,0,0) !important;
-position: absolute;
-right: 10px
-}
-.AnchorContent::-webkit-scrollbar-track {
--webkit-box-shadow: none;
-border-radius: 0;
-background-color: rgba(0,0,0,0) !important
-}
-.AnchorContent::-webkit-scrollbar-thumb {
-border-radius: 0px;
--webkit-box-shadow: none;
-background-color: none;
-opacity: 0 !important;
-transition: all .3s
-}
-
-.AnchorContent:hover::-webkit-scrollbar-thumb {
-border-radius: 0px;
--webkit-box-shadow: none;
-background-color: #d4d6d8;
-border-right:2px solid #fff;
-opacity:1;
-}
-
-.AnchorContent::-webkit-scrollbar-thumb:hover {
-background-color: #c0c2c4 !important
+display: none;
 }
 
 
 /*导航*/
 .BlogAnchor {
-    background: #fff;
+    background: #ffffff66;
     padding: 10px 0 ;
     line-height: 180%;
     position: fixed;
@@ -138,7 +103,7 @@ background-color: #c0c2c4 !important
 }
 .BlogAnchor li .nav_item.current{
     color: #087cd2;
-    background-color: rgba(238,242,249,.8);
+    background-color: rgba(236, 243, 255, 0.8);
     border-left:4px solid #087cd2;
     text-indent: 20px;
     font-weight: bold;

@@ -106,7 +106,7 @@ async function netParser() {
             var killpid = -1; // 关闭窗口后杀死被调用进程
             var closeOnBroke = false; // 断开连接后关闭窗口
             var mainWindow;
-            var pwd='';
+            var pwd = '';
             // 我们获得一个连接 - 该连接自动关联一个socket对象
             // console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
 
@@ -246,6 +246,8 @@ function showDoc() {
         width: 1200,
         height: 700,
         titleBarStyle: 'hidden',
+        transparent: true,
+        vibrancy: 'popover',
         webPreferences: {
             enableRemoteModule: true,
             nodeIntegration: true,
