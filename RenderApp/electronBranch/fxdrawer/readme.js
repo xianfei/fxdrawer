@@ -1,6 +1,8 @@
 const { remote, ipcRenderer } = require('electron')
 const { FindInPage } = require('electron-find')
 
+window.$ = window.jQuery = require("./jquery.js");
+
 let findInPage = new FindInPage(remote.getCurrentWebContents(), {
   offsetTop: 30,
   offsetRight: 10
@@ -31,6 +33,7 @@ window.onload = ()=>{
       replaceText('system-version', os.arch()+' platform ( OS: '+(process.platform === 'darwin'?'macOS':os.version())+', '+process.getSystemVersion()+' ) ')
 
       if(process.platform === 'darwin'){
+        $('#border').hide();
           document.getElementsByClassName('html_header')[0].setAttribute('style','margin-top:20px')
           document.getElementById('btns').innerHTML = String.raw`<button class="mdui-btn mdui-btn-icon"
         style="position: fixed;right: 10px;top: 0;-webkit-app-region: no-drag;z-index: 11;" id="minbtn"
@@ -38,6 +41,8 @@ window.onload = ()=>{
         `
         return
       }
+
+      $('html').css('background','#ffffffcc')
 
       document.getElementById('btns').innerHTML = String.raw`<button class="mdui-btn mdui-btn-icon"
       style="position: fixed;right: 5px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"

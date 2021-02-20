@@ -6,10 +6,10 @@
   "scripts": {
     "start": "electron .",
     "package": "npm-run-all package:*",
-    "package:win32": "electron-packager ./ fxdrawer --platform=win32 --arch=ia32 --out ./OutApp --icon=app-icon/win/app.ico",
-    "package:win64": "electron-packager ./ fxdrawer --platform=win32 --arch=x64 --out ./OutApp --icon=app-icon/win/app.ico",
-    "package:mac64": "electron-packager ./ fxdrawer --platform=darwin --arch=x64 --out ./OutApp --icon=app-icon/mac/app.icns",
-    "package:macarm": "electron-packager ./ fxdrawer --platform=darwin --arch=arm64 --out ./OutApp --icon=app-icon/mac/app.icns"
+    "package:win32": "electron-packager ./ fxdrawer --platform=win32 --arch=ia32 --out ./OutApp --icon=app-icon/win/app.ico --download.mirrorOptions.mirror=https://npm.taobao.org/mirrors/electron/",
+    "package:win64": "electron-packager ./ fxdrawer --platform=win32 --arch=x64 --out ./OutApp --icon=app-icon/win/app.ico --download.mirrorOptions.mirror=https://npm.taobao.org/mirrors/electron/",
+    "package:mac64": "electron-packager ./ fxdrawer --platform=darwin --arch=x64 --out ./OutApp --icon=app-icon/mac/app.icns --download.mirrorOptions.mirror=https://npm.taobao.org/mirrors/electron/",
+    "package:macarm": "electron-packager ./ fxdrawer --platform=darwin --arch=arm64 --out ./OutApp --icon=app-icon/mac/app.icns --download.mirrorOptions.mirror=https://npm.taobao.org/mirrors/electron/"
   },
   "keywords": [],
   "author": "",
@@ -18,10 +18,12 @@
     "electron-find": "^1.0.6",
     "find-process": "^1.4.4",
     "sudo-prompt": "^9.2.1",
+    "windows10-electron-vibrancy": "^1.0.1",
     "ws": "^7.4.3"
   },
   "devDependencies": {
     "electron": "^11.2.0",
-    "electron-packager": "^15.2.0"
+    "electron-packager": "^15.2.0",
+    "electron-rebuild": "^2.3.5"
   }
 }

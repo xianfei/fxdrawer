@@ -7,9 +7,7 @@
     <!-- This is a welcome page for fxD -->
     <link rel="stylesheet" href="./mdui-v1/css/mdui.css">
     <style type="text/css">
-    ::-webkit-scrollbar {
-    display: none;
-}
+
       </style>
 </head>
 
@@ -20,11 +18,16 @@
     </div>
     <div id='btns' style="-webkit-app-region: nodrag;"></div>
     <div style="inset: 28px 0px 0px; position: absolute; overflow: auto;">
-        <div id='welcome' style="padding-left: 40px;padding-top: 20px;">
+        <div id='welcome' style="padding-left: 40px;padding-top: 20px;line-height: 30px;overflow:scroll;">
           <h1>欢迎使用fxDrawer</h1>
-          为了您能正常使用fxDrawer，您需要将fxDrawer目录添加到PATH环境变量中。<br><br>
-          当前目录:<span id="dir"></span><span id="result"></span><br><br><button id="addtopathBtn">添加到Path</button>&nbsp;<span id="stdout"></span>
-          <br><br>您可以点击标题栏中的 <i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i> 图标查看用户手册及使用方法。
+          为了您能正常使用fxDrawer，您需要将fxDrawer目录添加到PATH环境变量中。<br>
+          当前目录:<span id="dir"></span><span id="result"></span><br><button id="addtopathBtn">添加到Path</button>&nbsp;<span id="stdout"></span>
+          <br>您可以点击标题栏中的 <i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i> 图标查看用户手册及使用方法。<br>
+          如果您已经设计好了您的程序，想将其作为Web应用运行，您可以点击标题栏中的 <i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">public</i> 图标来启动fxDrawer Web Server，无需重新编译，即可通过HTTP协议来使用您的应用程序。
+          <br><span id="vs">检测到您使用的是Windows操作系统，如果您恰好使用Visual Studio 2019及以上版本开发C/C++程序，您可以<button id="vsBtn">安装预编译的VS库文件</button></span>
+          <br><span id="vsout" style="white-space: pre-line;"></span>
+        
+        
         </div>
         
     </div>

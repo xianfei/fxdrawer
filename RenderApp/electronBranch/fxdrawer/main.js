@@ -25,6 +25,10 @@ ipcMain.on('showdoc', (event, arg) => {
     showDoc()
 })
 
+ipcMain.on('showwebserv', (event, arg) => {
+    showServ()
+})
+
 // 程序入口
 function fxStart() {
     //console.log(process.argv)
@@ -64,7 +68,7 @@ function fxStart() {
     var helloWindow;
     if (isMac) helloWindow = new BrowserWindow({
         width: 700,
-        height: 400,
+        height: 450,
         titleBarStyle: 'hidden',
         webPreferences: {
             enableRemoteModule: true,
@@ -75,7 +79,7 @@ function fxStart() {
     else
         helloWindow = new BrowserWindow({
             width: 700,
-            height: 400,
+            height: 450,
             frame: false,
             webPreferences: {
                 enableRemoteModule: true,
@@ -100,7 +104,6 @@ async function netParser() {
                 }
             });
     });
-    console.log('now statrt')
     try {
         let tcpConnect = net.createServer(function (sock) {
             var killpid = -1; // 关闭窗口后杀死被调用进程
@@ -254,11 +257,13 @@ function showDoc() {
             contextIsolation: false,
         }
     });
-    else
+    else{
+        // !important   is maybe not suit for linux
         docWindow = new BrowserWindow({
             width: 1200,
             height: 700,
             frame: false,
+            transparent: true,
             webPreferences: {
                 enableRemoteModule: true,
                 nodeIntegration: true,
@@ -266,8 +271,18 @@ function showDoc() {
             }
         })
 
+        docWindow.on('ready-to-show',function() {
+            var electronVibrancy = require('windows10-electron-vibrancy');
+            
+            electronVibrancy.setVibrancy(docWindow)
+          
+            docWindow.show();
+          });
+    }
     // and load the html of the app.
     docWindow.loadFile('readme.html')
+
+    // docWindow.toggleDevTools();
 
     if (!isMac) return
     // 设置touchbar on macos

@@ -45,6 +45,9 @@ window.onload = function () {
       <button class="mdui-btn mdui-btn-icon"
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;left: 40px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
       onclick="ipcRenderer.send('showdoc', '')" title="Show Document"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i></button>
+      <button class="mdui-btn mdui-btn-icon"
+      style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;left: 75px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
+      onclick="ipcRenderer.send('showwebserv', '')" title="Open WebServ"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">public</i></button>
       `
     maximizeBtn()
     document.getElementById('maxbtn').addEventListener('click', () => {
@@ -58,6 +61,9 @@ window.onload = function () {
       <button class="mdui-btn mdui-btn-icon"
       style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;right: 40px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
       onclick="ipcRenderer.send('showdoc', '')" title="Show Document"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">help_outline</i></button>
+      <button class="mdui-btn mdui-btn-icon"
+      style="height:28px;width:28px;min-width:28px;line-height:28px;position: fixed;right: 75px;top: 0px;-webkit-app-region: no-drag;z-index: 11;" id="closebtn"
+      onclick="ipcRenderer.send('showwebserv', '')" title="Open WebServ"><i class="mdui-icon material-icons" style="font-size: 18px;text-shadow: 0 0 3px #fff, 0 0 3px #fff; ">public</i></button>
       `
   }
 
@@ -92,10 +98,10 @@ window.onload = function () {
     } else {
       $('#result').text('不在Path中。')
     }
-    console.log(pathStr)
 
   }
   else {
+    $('#vs').hide()
     cp.exec('echo $PATH', (err, stdout, stderr) => {
       if (err) {
         console.log(err);
@@ -108,23 +114,34 @@ window.onload = function () {
       } else {
         $('#result').text('不在Path中。')
       }
-      console.log(pathStr)
     })
   }
 
 
 
-
+  $('#vsBtn').on('click', addvs)
   $('#addtopathBtn').on('click', addToPath)
 }
+function addvs() {
+    sudo.exec('chcp 437 > nul && ' + fxPath + '/addlibforvs/addlibforvsadmin.bat', options,
+      function (error, stdout, stderr) {
+        if (error) {
+            $('#vsout').html(error + '<br>安装失败，请尝试手动安装');
+          return;
+        }
+        $('#vsout').html(stdout);
+      }
+    );
+  }
+
 
 function addToPath() {
   if (process.platform == 'win32') {
-    sudo.exec('setx PATH "' + fxPath + ';%PATH%" /m && setx FXDRAWER_HOME "' + fxPath + '" /m', options,
+    sudo.exec('chcp 437 > nul && setx PATH "' + fxPath + ';%PATH%" /m && setx FXDRAWER_HOME "' + fxPath + '" /m', options,
       function (error, stdout, stderr) {
         if (error) {
           console.log(error);
-          cp.exec('setx PATH "' + fxPath + ';%PATH%" && setx FXDRAWER_HOME "' + fxPath + '"', (err, stdout, stderr) => {
+          cp.exec('chcp 437 > nul && setx PATH "' + fxPath + ';%PATH%" && setx FXDRAWER_HOME "' + fxPath + '"', (err, stdout, stderr) => {
             if (err) {
               console.log(err);
               return;
