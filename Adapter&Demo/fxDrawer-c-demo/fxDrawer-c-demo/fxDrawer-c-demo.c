@@ -1,34 +1,37 @@
 ﻿// fxDrawer-c-demo.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "fxdrawer.h"
  // #pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 
-int main() {	
-	initDrawer(600, 400);
-	int x, y, width = 1.5;
-	objID butClr = putButton(500, 300, 80, 20, "清空");
-	objID inputColor = putInputBox(500, 50, 80, 20, "color");
-	objID inputLineWidth = putInputBox(500, 80, 80, 20, "range\" min='0' max='10' value='1.5' step=\"0.5");
-	setColorW(fxColorLightPink);
-	char str[20];
-	showInputDialog("123", str);
-	while (1) {
-		waitForAny(str);
-		if(sscanf_s(str,"xy:%d,%d",&x,&y))
-			drawPoint(x, y, width,50); 
-		else if (sscanf_s(str, "id:%d", &x))
-			if(x==butClr)clearDraw();
-			else if (x == inputColor) {
-				getText(inputColor, str);
-				setColorW(str);
-			} else if (x == inputLineWidth) {
-				getText(inputLineWidth, str);
-				width = atof(str);
-			}
-	}
+int main() {
+    initDrawer(700, 400);
+    setColor(24, 138, 255, 0.5);
+    objID label1ID = putText(400, 50, "Hello 你好😆\n这是一个图形库的Demo", 16);
+    setColor(255, 0, 0, 0.3);
+    objID circleID = drawCircle(150, 150, 50);
+    setColor(0, 255, 0, 0.3);
+    objID label2ID = putText(400, 300, "Hello 你好😆\n这是一个图形库的Demo", 16);
+    objID rectID = drawRectangle(120, 150, 40, 80);
+    setColor(0, 0, 255, 0.3);
+    int xPoints[] = {200, 200, 400}; int yPoints[] = {200, 300, 300}; // 顶点坐标数组
+    objID triaID = drawPolygon(3, xPoints, yPoints); // 三角形
+    changeText(label1ID, "点击按钮十次退出程序\n点击三次删除圆形\n点击五次删除矩形\n点击七次删除三角形");
+    objID butID = putButton(400, 220, 100, 50, "click here");
+    while (1) {
+        static int counter = 0;
+        char str[32];
+        if (waitForClick() == butID) {
+            sprintf(str, "您点击了按钮%d次", ++counter);
+            changeText(label2ID, str);
+        }
+        if (counter == 10)break;
+        if (counter == 3)removeByID(circleID);
+        if (counter == 5)removeByID(rectID);
+        if (counter == 7)removeByID(triaID);
+    }
+    closeDrawer();
+    return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
