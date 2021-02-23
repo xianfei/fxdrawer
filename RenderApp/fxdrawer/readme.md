@@ -481,7 +481,23 @@ void fxSetCloseOnBroke(int isIt);
 
 # 示例
 
-见项目中c语言和Python的demo项目 (几乎一样喔~)
+1. 基本语法展示 （c/python）
+
+https://github.com/xianfei/fxdrawer/tree/master/Adapter%26Demo/fxDrawer-c-demo
+
+https://github.com/xianfei/fxdrawer/tree/master/Adapter%26Demo/fxDrawer-python-demo
+
+![](img/1.png)
+
+2. 中国麻将Demo （c++）
+
+https://github.com/xianfei/fxdrawer/tree/master/Adapter%26Demo/fxDrawer-c-demo-mahjong
+
+![](img/4.png)
+
+3. 画板 （c）
+
+https://github.com/xianfei/fxdrawer/tree/master/Adapter%26Demo/fxDrawer-c-demo-paint
 
 # 开发者工具
 

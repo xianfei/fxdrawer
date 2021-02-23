@@ -17,9 +17,9 @@ window.onload = () => {
   for(var ee of $('.url')) {
     ee.onclick = (event)=>{
       event.preventDefault();
-      shell.openExternal(ee.innerHTML);
+      shell.openExternal(event.target.href);
     }
-    ee.href = "javascript:void(0)";
+    // ee.href = "javascript:void(0)";
   }
 
   document.getElementById('conly').onchange = function () {
