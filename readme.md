@@ -24,7 +24,7 @@
 
 ### 3. 安装
 
-在[Release页面](releases/)中下载对应系统的程序包，解压后放置到任意喜欢位置（macOS中建议将程序拖拽至 应用程序 文件夹），运行程序（Windows下为fxdrawer.exe）并按照程序提示添加PATH目录，编程时可将libs文件夹中对应语言的库复制到您的项目中。
+在[Release页面](https://github.com/xianfei/fxdrawer/releases/)中下载对应系统的程序包，解压后放置到任意喜欢位置（macOS中建议将程序拖拽至 应用程序 文件夹），运行程序（Windows下为fxdrawer.exe）并按照程序提示添加PATH目录，编程时可将libs文件夹中对应语言的库复制到您的项目中。
 
 ### 4. 编译
 
