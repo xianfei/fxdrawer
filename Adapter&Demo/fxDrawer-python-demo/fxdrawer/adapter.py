@@ -157,8 +157,8 @@ def putImage(x, y, w, h, pathString):
     return int(ret[2:])
 
 
-def putInputBox(x, y, w, h, type):
-    sendData = {'action': "add", "object": "input", "x": x, "y": y, "w": w, 'h': h, 'type': type}
+def putInputBox(x, y, w, h, type_='text'):
+    sendData = {'action': "add", "object": "input", "x": x, "y": y, "w": w, 'h': h, 'type': type_}
     ret = sendDict(sendData)
     if verboseMode:
         print(ret)
