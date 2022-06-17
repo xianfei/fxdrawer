@@ -22,7 +22,7 @@
     "ws": "^7.4.3"
   },
   "devDependencies": {
-    "electron": "^11.5.0",
+    "electron": "^15.5.5",
     "electron-packager": "^15.2.0",
     "electron-rebuild": "^2.3.5"
   }
