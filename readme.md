@@ -20,6 +20,7 @@ In software development, it is often necessary to use different syntaxes for wri
 
 - 打通桌面GUI程序/Web程序，无需修改及重新编译即可将桌面程序转换为Web程序
 
+
 - Support HiDPI, anti-aliasing, touch screen, keyboard touchbar (on some MacBook) and other cool features
 
 - Cross-platform and cross-language
@@ -46,8 +47,6 @@ Download the package from [Release](https://github.com/xianfei/fxdrawer/releases
 
 依赖：NodeJS环境
 
-Dependencies: NodeJS environment
-
 1. 克隆该项目(或下载代码压缩包并解压)并进入文件夹内
 
 2. `cd RenderApp/fxdrawer`
@@ -57,6 +56,8 @@ Dependencies: NodeJS environment
 4. 编译`npm run package`(如果只想编译某一平台可进行指定，如`npm run package:win64`)
 
 5. 生成的文件在RenderApp/fxdrawer/OutApp下
+
+Dependencies: NodeJS environment
 
 1. Clone the project (or download the code zip and unzip it) and go to the folder
 
