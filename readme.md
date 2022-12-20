@@ -10,6 +10,8 @@ Cross-platform graphics library for different languages. Currently adapted to C/
 
 In software development, it is often necessary to use different syntaxes for writing user GUIs in different languages and on different platforms. This project introduces Web front-end and back-end separation technology to desktop application development, realizing the use of the same set of syntax to write GUI applications in different languages and platforms, the syntax is similar to the EGE learned in C/C++ class, and can convert desktop applications to Web applications without changes and recompilation, truly bridging the gap between platforms, languages, and desktop and Web applications. This truly bridges the gap between platforms, languages, and desktop and web applications, greatly improving the efficiency of writing programs and simplifying learning for developers. In addition, the graphics library comes with advanced developer tools and supports H5/CSS/JS writing controls. The project has been applied to the first-year C++ teaching of software engineering.
 
+![](https://user-images.githubusercontent.com/8101613/208649320-da72b68c-b6be-4cfa-984a-9715e6e096d6.JPG)
+
 ### 1. 特色功能 Features
 
 - 支持高分屏、抗锯齿、触摸屏、键盘触摸条等炫酷功能
