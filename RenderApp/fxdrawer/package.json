@@ -19,7 +19,7 @@
     "find-process": "^1.4.4",
     "sudo-prompt": "^9.2.1",
     "windows10-electron-vibrancy": "^1.0.1",
-    "ws": "^7.4.3"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "electron": "^11.5.0",
